@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 void readFilename(char* input);
-void copyTextFile(FILE* inputFile, FILE* outputFile);
+void revertTextFile(FILE* inputFile, FILE* outputFile);
 
 int main(void) {
 
@@ -32,7 +32,7 @@ int main(void) {
         return 5;
     }
 
-    copyTextFile(inputFile, outputFile);
+    revertTextFile(inputFile, outputFile);
 
     fclose(inputFile);
     fclose(outputFile);
@@ -58,11 +58,17 @@ void readFilename(char* input) {
     *pointer = '\0';
 }
 
-void copyTextFile(FILE* inputFile, FILE* outputFile) {
+void revertTextFile(FILE* inputFile, FILE* outputFile) {
 
-    int c;
+    fseek(inputFile, 0, SEEK_END);
+    int fileSize = ftell(inputFile);
 
-    while ((c = getc(inputFile)) != EOF) {
-        fprintf(outputFile, "%c", c);
+    if (fileSize == 0) {
+        return;
+    }
+
+    for (int i = fileSize - 1; i >= 0; i-- ) {
+        fseek(inputFile, i, SEEK_SET);
+        fputc(fgetc(inputFile), outputFile);
     }
 }
