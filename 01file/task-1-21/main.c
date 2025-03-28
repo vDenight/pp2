@@ -95,9 +95,9 @@ _Bool verifyCoords(FILE* cordHandle, long int messagePos, long int endPos) {
     long int characterIndex = 0;
 
     while (ftell(cordHandle) != messagePos - 1) {
-        fscanf(cordHandle, "%ld", &characterIndex);
+        int scanfVal = fscanf(cordHandle, "%ld", &characterIndex);
 
-        if (characterIndex >= endPos || characterIndex < messagePos) {
+        if (characterIndex >= endPos || characterIndex < messagePos || scanfVal == 0) {
             return 0;
         }
     }
