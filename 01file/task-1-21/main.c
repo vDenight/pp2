@@ -2,6 +2,7 @@
 
 void readFilename(char* input);
 _Bool readSecretMessage(FILE* cordHandle, FILE* messageHandle);
+_Bool verifyCoords(FILE* cordHandle, long int messagePos, long int endPos);
 
 int main(void) {
     printf("Podaj sciezke do pliku:\n");
@@ -71,6 +72,26 @@ _Bool readSecretMessage(FILE* cordHandle, FILE* messageHandle) {
     fseek(messageHandle, 0, SEEK_END);
     endPos = ftell(messageHandle);
 
+    if (!verifyCoords(cordHandle, messagePos, endPos)) {
+        return 0;
+    }
+
+    long int characterIndex = 0;
+    while (ftell(cordHandle) != messagePos - 1) {
+        fscanf(cordHandle, "%ld", &characterIndex);
+        fseek(messageHandle, characterIndex, SEEK_SET);
+        printf("%c", fgetc(messageHandle));
+    }
+
+    return 1;
+
+}
+
+_Bool verifyCoords(FILE* cordHandle, long int messagePos, long int endPos) {
+
+    long int currentPos = ftell(cordHandle);
+    fseek(cordHandle, 0, SEEK_SET);
+
     long int characterIndex = 0;
 
     while (ftell(cordHandle) != messagePos - 1) {
@@ -79,11 +100,8 @@ _Bool readSecretMessage(FILE* cordHandle, FILE* messageHandle) {
         if (characterIndex >= endPos || characterIndex < messagePos) {
             return 0;
         }
-
-        fseek(messageHandle, characterIndex, SEEK_SET);
-        printf("%c", fgetc(messageHandle));
     }
 
+    fseek(cordHandle, currentPos, SEEK_SET);
     return 1;
-
 }
