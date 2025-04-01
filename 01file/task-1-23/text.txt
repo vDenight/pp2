@@ -1,5 +1,5 @@
 first.txt
 no.exist
 second.txt
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaa
+aaaaaaaaaaaa

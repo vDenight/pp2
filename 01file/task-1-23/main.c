@@ -5,6 +5,7 @@ void readFilename(char* input);
 int read_file(const char* filename);
 void process_buffer(char* input);
 void print_file(FILE* file);
+_Bool check_first_file(const char* filename);
 
 int main(void) {
     printf("Podaj sciezke do pliku:\n");
@@ -13,10 +14,13 @@ int main(void) {
 
     readFilename(input);
 
-    if (read_file(input) < 0) {
-        printf("Couldn't open file");
+    if (!check_first_file(input)) {
+        printf("couldn't open file");
         return 4;
     }
+
+    int count = read_file(input);
+    printf("%d", count);
 
     return 0;
 
@@ -40,30 +44,21 @@ int read_file(const char* filename) {
 
     FILE* file = fopen(filename, "r");
 
-    if (file == NULL)
-        return -1;
+    if (file == NULL) {
+        return 0;
+    }
 
     int count = 0;
 
     char buffer[31];
-
-    while (fgets(buffer, 50, file) != NULL) {
+    while (fgets(buffer, 30, file) != NULL) {
         process_buffer(buffer);
         printf("%s\n", buffer);
-        FILE* innerFile = fopen(buffer, "r");
-        if (innerFile == NULL)
-            continue;
-
-        // the opening is successful
-        count++;
-        print_file(innerFile);
-        fclose(innerFile);
+        count += read_file(buffer);
     }
 
     fclose(file);
-
-    return count;
-
+    return count + 1;
 }
 
 void process_buffer(char* input) {
@@ -83,12 +78,15 @@ void process_buffer(char* input) {
     *pointer = '\0';
 }
 
-void print_file(FILE* file) {
-    int c;
-
-    while ((c = getc(file)) != EOF) {
-        printf("%c", c);
+_Bool check_first_file(const char* filename) {
+    if (filename == NULL) {
+        return 0;
     }
-
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        return 0;
+    }
+    fclose(file);
+    return 1;
 }
 
