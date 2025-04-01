@@ -1,11 +1,9 @@
 #include <stdio.h>
-#include <string.h>
 
 void readFilename(char* input);
 int read_file(const char* filename);
 void process_buffer(char* input);
 void print_file(FILE* file);
-_Bool check_first_file(const char* filename);
 
 int main(void) {
     printf("Podaj sciezke do pliku:\n");
@@ -14,10 +12,13 @@ int main(void) {
 
     readFilename(input);
 
-    if (!check_first_file(input)) {
+    // check if file exists
+    FILE* file = fopen(input, "r");
+    if (file == NULL) {
         printf("couldn't open file");
         return 4;
     }
+    fclose(file);
 
     int count = read_file(input);
     printf("%d", count);
@@ -41,6 +42,10 @@ void readFilename(char* input) {
 }
 
 int read_file(const char* filename) {
+
+    if (filename == NULL) {
+        return -1;
+    }
 
     FILE* file = fopen(filename, "r");
 
@@ -76,17 +81,5 @@ void process_buffer(char* input) {
     }
 
     *pointer = '\0';
-}
-
-_Bool check_first_file(const char* filename) {
-    if (filename == NULL) {
-        return 0;
-    }
-    FILE* file = fopen(filename, "r");
-    if (file == NULL) {
-        return 0;
-    }
-    fclose(file);
-    return 1;
 }
 
