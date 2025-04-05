@@ -11,18 +11,22 @@ struct message_t
 
 int load_data(struct message_t *cp, int size, const char *filename);
 int decode_message(const struct message_t *cp, int size, char *msg, int text_size);
+void readFilename(char* input);
 
 int main(void) {
 
     struct message_t message_array[100];
+    char msg[1101];
+    char input[31];
 
-    char msg[1000];
+    printf("Enter filename: ");
+    readFilename(input);
 
-    load_data(message_array, 10, "test2.bin");
+    int loaded_amount = load_data(message_array, 100, input);
+    printf("Loaded %d messages\n", loaded_amount);
+    decode_message(message_array, loaded_amount, msg, 1101);
 
-    decode_message(message_array, 10, msg, 110);
-
-    printf("secret: %s\n", msg);
+    printf("%s", msg);
 
     return 0;
 }
@@ -45,8 +49,9 @@ int load_data(struct message_t *cp, int size, const char *filename) {
         return -3;
 
     int read_amount = (int) fread(cp, sizeof(struct message_t), size, fp);
-    if (read_amount  * 24 != amount_of_bytes)
-        return -3;
+
+    // if (read_amount  * 24 != amount_of_bytes)
+    //     return -3;
 
     fclose(fp);
 
@@ -68,7 +73,14 @@ int decode_message(const struct message_t *cp, int size, char *msg, int text_siz
         void *double_pointer = &current_message_pointer->b;
         void *char_pointer = &current_message_pointer->a;
         void *int_pointer = &current_message_pointer->c;
+
         for (int j = 0; j < sizeof(struct message_t); j++) {
+
+            if (current_text_size == text_size - 1) {
+                *msg = '\0';
+                return 0;
+            }
+
             if ((void*) current_point >= int_pointer && (void*) current_point < int_pointer + sizeof(int)) {
                 current_point ++;
                 continue;
@@ -94,3 +106,18 @@ int decode_message(const struct message_t *cp, int size, char *msg, int text_siz
 
     return 0;
 }
+
+void readFilename(char* input) {
+    int count = 0;
+    char c;
+    char* pointer = input;
+
+    while ((c = getchar()) != '\n' && count < 30) {
+        *pointer = c;
+        pointer++;
+        count++;
+    }
+
+    *pointer = '\0';
+}
+
