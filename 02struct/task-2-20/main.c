@@ -55,7 +55,11 @@ int load_data(struct message_t *cp, int size, const char *filename) {
         return -2;
 
     unsigned int amount_of_bytes = 0;
-    fread(&amount_of_bytes, sizeof(unsigned int), 1, fp);
+    size_t fread_value = fread(&amount_of_bytes, sizeof(unsigned int), 1, fp);
+    if (fread_value != 1) {
+        fclose(fp);
+        return -3;
+    }
 
     if (amount_of_bytes  % 24 != 0) {
         fclose(fp);
@@ -88,20 +92,20 @@ int decode_message(const struct message_t *cp, int size, char *msg, int text_siz
         void *char_pointer = &current_message_pointer->a;
         void *int_pointer = &current_message_pointer->c;
 
-        for (int j = 0; j < (int) sizeof(struct message_t); j++) {
+        while (current_point < (char*) current_message_pointer + 24) {
 
             if (current_text_size == text_size - 1) {
                 *msg = '\0';
                 return 0;
             }
 
-            if ((void*) current_point >= int_pointer && (void*) current_point < (void*) ((char*) int_pointer + 4)) {
-                current_point ++;
+            if ((void*) current_point == int_pointer) {
+                current_point += 4;
                 continue;
             }
 
-            if ((void*) current_point >= double_pointer && (void*) current_point < (void*) ((char*) double_pointer + 8)) {
-                current_point ++;
+            if ((void*) current_point == double_pointer) {
+                current_point += 8;
                 continue;
             }
 
@@ -109,7 +113,7 @@ int decode_message(const struct message_t *cp, int size, char *msg, int text_siz
                 current_point ++;
                 continue;
             }
-            *msg = *current_point; // 	Assigned value is garbage or undefined
+            memcpy((char*) msg, (char*) current_point, 1);
             msg++;
             current_text_size ++;
             current_point ++;
