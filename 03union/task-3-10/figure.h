@@ -58,7 +58,7 @@ void display_triangle(const struct triangle_t *t);
 void display_circle(const struct circle_t *circ);
 void display_figure(struct figure_t *f);
 
-int compare_figures_by_area(const struct figure_t *f, const struct figure_t *g);
+int compare_figures_by_area(const void *f, const void *g);
 int sort_by_area(struct figure_t **figures, int size);
 
 #endif //FIGURE_H

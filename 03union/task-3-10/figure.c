@@ -2,15 +2,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "math.h"
+#include <math.h>
 
 float area_triangle(const struct triangle_t *t) {
-    return fabs((float)(((t->p1.x - t->p2.x) * (t->p3.y - t->p1.y)) / 2 - ((t->p2.y - t->p1.y) * (t->p3.x - t->p2.x)) / 2));
+    return fabsf((float)(t->p1.x * (t->p2.y - t->p3.y) +
+                         t->p2.x * (t->p3.y - t->p1.y) +
+                         t->p3.x * (t->p1.y - t->p2.y))) * 0.5f;
 }
 
 float area_rectangle(const struct rectangle_t *r) {
-    return r->width * r->height;
+    return (float) r->width * (float) r->height;
 }
 
 float area_circle(const struct circle_t *c) {
@@ -48,15 +49,18 @@ void display_figure(struct figure_t *f) {
     switch (f->type) {
         case TRIANGLE:
             display_triangle(&f->triangle);
+            break;
         case RECTANGLE:
             display_rectangle(&f->rect);
+            break;
         case CIRCLE:
             display_circle(&f->circ);
+            break;
     }
 }
 
-int compare_figures_by_area(const struct figure_t *f, const struct figure_t *g) {
-    return (int) (area_figure(f) - area_figure(g));
+int compare_figures_by_area(const void* f, const void* g) {
+    return (int) (area_figure((const struct figure_t*)f) - area_figure((const struct figure_t*)g));
 }
 
 int sort_by_area(struct figure_t **figures, int size) {
