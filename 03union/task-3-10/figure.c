@@ -137,11 +137,17 @@ int compare_figures_by_area(const void* f, const void* g) {
     struct figure_t **f1 = (struct figure_t **) f;
     struct figure_t **f2 = (struct figure_t **) g;
 
-    return (int) area_figure(*f2) - (int) area_figure(*f1);
+    if (area_figure(*f2) - area_figure(*f1) > 0) {
+        return 1;
+    }
+    if (area_figure(*f2) - area_figure(*f1) < 0) {
+        return -1;
+    }
+    return 0;
 }
 
 int sort_by_area(struct figure_t **figures, int size) {
-    if (figures == NULL || size < 0)
+    if (figures == NULL || size <= 0)
         return 1;
 
     struct figure_t* current_figure = *figures;
