@@ -162,3 +162,58 @@ int sort_by_area(struct figure_t **figures, int size) {
 
     return 0;
 }
+
+_Bool validate_figure(struct figure_t *f) {
+    if (f == NULL)
+        return 0;
+
+    switch (f->type) {
+        case TRIANGLE:
+            return validate_triangle(&f->triangle);
+        case RECTANGLE:
+            return validate_rectangle(&f->rect);
+        case CIRCLE:
+            return validate_circle(&f->circ);
+        default:
+            return 0;
+    }
+}
+
+_Bool validate_triangle(struct triangle_t *t) {
+    if (t == NULL)
+        return 0;
+
+    // p1 == p2
+    if (t->p1.x == t->p2.x && t->p1.y == t->p2.y)
+        return 0;
+
+    // p1 == p3
+    if (t->p1.x == t->p3.x && t->p1.y == t->p3.y)
+        return 0;
+
+    // p2 == p3
+    if (t->p2.x == t->p3.x && t->p2.y == t->p3.y)
+        return 0;
+
+    return 1;
+}
+
+_Bool validate_rectangle(struct rectangle_t *r) {
+    if (r == NULL)
+        return 0;
+
+    if (r->width <= 0 || r->height <= 0)
+        return 0;
+
+    return 1;
+}
+
+_Bool validate_circle(struct circle_t *c) {
+    if (c == NULL)
+        return 0;
+
+    if (c->r <= 0)
+        return 0;
+
+    return 1;
+}

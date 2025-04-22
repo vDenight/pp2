@@ -61,4 +61,9 @@ void display_figure(struct figure_t *f);
 int compare_figures_by_area(const void *f, const void *g);
 int sort_by_area(struct figure_t **figures, int size);
 
+_Bool validate_rectangle(struct rectangle_t *rect);
+_Bool validate_triangle(struct triangle_t *t);
+_Bool validate_circle(struct circle_t *circ);
+_Bool validate_figure(struct figure_t *f);
+
 #endif //FIGURE_H
