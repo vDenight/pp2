@@ -30,4 +30,6 @@ int circular_buffer_full(const struct circular_buffer_t *a);
 
 void circular_buffer_display(const struct circular_buffer_t *a);
 
+_Bool circular_buffer_validate(const struct circular_buffer_t *a);
+
 #endif //CIRCULAR_BUFFER_H
