@@ -38,16 +38,12 @@ int circular_buffer_create_struct(struct circular_buffer_t **cb, int N) {
         return 2;
     }
 
-    circ_buff->ptr = malloc(N * sizeof(int));
+    int create_val = circular_buffer_create(circ_buff, N);
 
-    if (circ_buff->ptr == NULL) {
+    if (create_val != 0) {
         free(circ_buff);
         return 2;
     }
-    circ_buff->capacity = N;
-    circ_buff->begin = 0;
-    circ_buff->end = 0;
-    circ_buff->full = 0;
 
     *cb = circ_buff;
 
