@@ -24,4 +24,7 @@ int* image_set_pixel(struct image_t *img, int x, int y);
 
 int draw_image(struct image_t *img, const struct image_t *src, int destx, int desty);
 
+_Bool is_pixel_available(const struct image_t *img, int x, int y);
+_Bool is_image_available(const struct image_t *img);
+
 #endif //IMAGE_UTILS_H

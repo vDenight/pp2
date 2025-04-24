@@ -89,7 +89,7 @@ struct image_t* load_image_t(const char *filename, int *err_code) {
                     free(*(m1->ptr + k));
                 }
                 if (err_code)
-                    *err_code = 4;
+                    *err_code = 3;
                 fclose(f);
                 free(m1->ptr);
                 free(m1);
@@ -115,7 +115,7 @@ format_error:
 
 int save_image_t(const char * filename, const struct image_t *m1) {
 
-    if (filename == NULL || m1 == NULL) {
+    if (filename == NULL || !is_image_available(m1)) {
         return 1;
     }
 
@@ -124,11 +124,109 @@ int save_image_t(const char * filename, const struct image_t *m1) {
     if (f == NULL)
         return 2;
 
+    // first write the file type
+    fprintf(f, "%s\n", m1->type);
 
+    // now vertices (width and height)
+    fprintf(f, "%d %d\n", m1->width, m1->height);
 
+    // this part is very enigmatic for now (max pixel val)
+    fprintf(f, "255\n");
+
+    // writing the pixels
+    for (int i = 0; i < m1->height; i++) {
+        for (int j = 0; j < m1->width; j++) {
+            fprintf(f, "%d\t", *(*(m1->ptr + i) + j));
+        }
+        fprintf(f, "\n");
+    }
 
     fclose(f);
     return 0;
 
+}
 
+void destroy_image(struct image_t **m) {
+    if (m == NULL)
+        return;
+
+    if (*m == NULL)
+        return;
+
+    if ((*m)->ptr != NULL) {
+        for (int i = 0; i < (*m)->height; i++) {
+            if (*((*m)->ptr + i) != NULL) {
+                free(*((*m)->ptr + i));
+                *((*m)->ptr + i) = NULL;
+            }
+        }
+        free((*m)->ptr);
+        (*m)->ptr = NULL;
+    }
+    free(*m);
+    *m = NULL;
+}
+
+_Bool is_pixel_available(const struct image_t *img, int x, int y) {
+    if (img == NULL || x < 0 || y < 0 || x >= img->width || y >= img->height) {
+        return 0;
+    }
+
+    if (img->ptr == NULL) {
+        return 0;
+    }
+
+    if (*(img->ptr + y) == NULL) {
+        return 0;
+    }
+
+    return 1;
+}
+
+const int* image_get_pixel(const struct image_t *img, int x, int y) {
+    return is_pixel_available(img, x, y) ? *(img->ptr + y) + x : NULL;
+}
+
+
+int* image_set_pixel(struct image_t *img, int x, int y) {
+    return is_pixel_available(img, x, y) ? *(img->ptr + y) + x : NULL;
+}
+
+_Bool is_image_available(const struct image_t *img) {
+    if (img == NULL)
+        return 0;
+
+    if (img->ptr == NULL)
+        return 0;
+
+    for (int i = 0; i < img->height; i++) {
+        if (*(img->ptr + i) == NULL)
+            return 0;
+    }
+
+    if (img->height <= 0 || img->width <= 0)
+        return 0;
+
+    return 1;
+}
+
+int draw_image(struct image_t *img, const struct image_t *src, int destx, int desty) {
+
+    if (!is_image_available(img) || !is_image_available(src)
+        || destx < 0 || desty < 0)
+        return 1;
+
+    // now check if it fits so basically destx + src->width <= img->width
+    if (destx + src->width > img->width || desty + src->height > img->height)
+        return 1;
+
+    // now we know it fits let's copy the pixels
+
+    for (int i = 0; i < src->height; i++) {
+        for (int j = 0; j < src->width; j++) {
+            *image_set_pixel(img, destx + j, desty + i) = *image_get_pixel(src, j, i);
+        }
+    }
+
+    return 0;
 }
