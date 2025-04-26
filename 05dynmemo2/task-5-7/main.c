@@ -9,21 +9,20 @@ enum ERROR_CODES {
     ALLOCATION_ERROR = 4,
 };
 
-char* create_modified_filename(const char* og_filename);
+char *create_modified_filename(const char *og_filename);
 
 int main(void) {
+    char *dest = NULL; // table of char for destination image filename
+    struct image_t *dest_img = NULL; // destination image struct
+    char *src_filename = NULL; // table of chars used for drawing additional images
 
-    char* dest = NULL; // table of char for destination image filename
-    struct image_t* dest_img = NULL; // destination image struct
-    char* src_filename = NULL; // table of chars used for drawing additional images
 
-
-    dest = (char*) malloc(40 * sizeof(char));
+    dest = (char *) malloc(40 * sizeof(char));
     if (dest == NULL)
         goto alloc_fail;
 
     printf("Enter destination image file name: ");
-    scanf("%s", dest);
+    scanf("%39s", dest);
 
     int err_code;
     dest_img = load_image_t(dest, &err_code);
@@ -59,7 +58,7 @@ int main(void) {
         return 2;
     }
 
-    src_filename = (char*) malloc(40 * sizeof(char));
+    src_filename = (char *) malloc(40 * sizeof(char));
 
     if (src_filename == NULL) {
         free(dest);
@@ -67,7 +66,7 @@ int main(void) {
         goto alloc_fail;
     }
 
-    struct image_t** srcs = NULL;
+    struct image_t **srcs = NULL;
 
     srcs = calloc(sizeof(struct image_t *), amount);
     if (srcs == NULL) {
@@ -81,10 +80,9 @@ int main(void) {
 
     // now we take all the filenames separately
     for (int i = 0; i < amount; i++) {
-
         // filename
         printf("Enter a name of a subimage: ");
-        scanf("%s", src_filename);
+        scanf("%39s", src_filename);
         *(srcs + i) = load_image_t(src_filename, &err_code);
 
         // error handling
@@ -110,18 +108,39 @@ int main(void) {
         //coping images
         printf("Enter coordinates (x, y): ");
         if (scanf("%d %d", &x, &y) != 2) {
-            destroy_image(srcs + i);
-            printf("Incorrect input");
-            continue;
+
+            for (int j = 0; j <= i; j++) {
+                destroy_image(srcs + j);
+            }
+            free(src_filename);
+            free(dest);
+            free(srcs);
+            destroy_image(&dest_img);
+
+            printf("Incorrect input\n");
+
+            return 1;
         }
 
         if (draw_image(dest_img, *(srcs + i), x, y)) {
             destroy_image(srcs + i);
-            printf("Incorrect input");
+            printf("Incorrect input data\n"); // w przykladzie bez data, w testach oczekuja z data
         }
     }
 
-    char* md_filename = create_modified_filename(dest);
+    char *md_filename = create_modified_filename(dest);
+
+    if (md_filename == NULL) {
+        for (int j = 0; j < amount; j++) {
+            if (*(srcs + j) != NULL)
+                destroy_image(srcs + j);
+        }
+        free(src_filename);
+        free(srcs);
+        free(dest);
+        destroy_image(&dest_img);
+        goto alloc_fail;
+    }
 
     if (save_image_t(md_filename, dest_img)) {
         printf("Couldn't create file");
@@ -136,7 +155,6 @@ int main(void) {
         destroy_image(&dest_img);
         free(md_filename);
         return 5;
-
     }
 
     printf("File saved"); // success at last
@@ -158,20 +176,26 @@ alloc_fail:
     return 8;
 }
 
-char* create_modified_filename(const char* og_filename) {
+char *create_modified_filename(const char *og_filename) {
     if (og_filename == NULL) {
         return NULL;
     }
 
-    size_t og_len = strlen(og_filename);
-    size_t md_len = og_len + strlen("_modified");
-    char* md_filename = (char*) malloc((md_len + 1) * sizeof(char));
+    char *dot = strrchr(og_filename, '.');
+    size_t md_len = strlen(og_filename) + strlen("_modified");
+    char *md_filename = malloc((md_len + 1) * sizeof(char));
+
     if (md_filename == NULL) {
         return NULL;
     }
 
     strcpy(md_filename, og_filename);
-    strcat(md_filename, "_modified");
 
+    if (dot != NULL) {
+        strcpy(md_filename + strlen(og_filename) - strlen(dot), "_modified");
+        strcpy(md_filename + strlen(og_filename) + strlen("_modified") - strlen(dot), dot);
+    } else {
+        strcat(md_filename, "_modified");
+    }
     return md_filename;
 }
