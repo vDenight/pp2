@@ -8,3 +8,5 @@ add_executable(task_5_12
 		statistics_utils.h
 		statistics_utils.c
 		main.c)
+
+target_link_libraries(task_5_12 m)

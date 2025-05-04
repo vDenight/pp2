@@ -4,6 +4,8 @@
 
 #include "statistics_utils.h"
 
+#include <math.h>
+
 void display(int **ptr) {
     if (ptr == NULL) {
       return;
@@ -17,18 +19,6 @@ void display(int **ptr) {
         }
         printf("\n");
         ptr++;
-    }
-}
-
-int load(const char *filename, int ***ptr, enum save_format_t format) {
-
-    switch (format) {
-        case fmt_text:
-            return load_txt(filename, ptr);
-        case fmt_binary:
-            return load_bin(filename, ptr);
-        default:
-            return 1;
     }
 }
 
@@ -267,6 +257,18 @@ int load_bin(const char *filename, int ***ptr) {
     return 0;
 }
 
+int load(const char *filename, int ***ptr, enum save_format_t format) {
+
+    switch (format) {
+        case fmt_text:
+            return load_txt(filename, ptr);
+        case fmt_binary:
+            return load_bin(filename, ptr);
+        default:
+            return 1;
+    }
+}
+
 void destroy(int ***ptr) {
     if (ptr == NULL) {
         return;
@@ -283,4 +285,95 @@ void destroy(int ***ptr) {
         ptr_cursor++;
     }
     free(*ptr);
+}
+int calculate_row_amount(int **ptr) {
+    int row_amount = 0;
+    while (*ptr != NULL) {
+        row_amount++;
+        ptr++;
+    }
+    return row_amount;
+}
+int calculate_row_length(int **ptr, int row_index) {
+    if (*(ptr + row_index) == NULL) {
+        return -1;
+    }
+    int row_length = 0;
+    while (*(*(ptr + row_index) + row_length) != -1) {
+        row_length++;
+    }
+    return row_length;
+}
+
+float calculate_row_avg(int *row, int row_length) {
+    float sum = 0;
+    for (int i = 0; i < row_length; i++) {
+        sum += *(row + i);
+    }
+    return sum / (float) row_length;
+}
+
+int find_row_min(int *row, int row_length) {
+    int min = *row;
+    for (int i = 0; i < row_length; i++) {
+        if (*(row + i) < min)
+            min = *(row + i);
+    }
+    return min;
+}
+
+int find_row_max(int *row, int row_length) {
+    int max = *row;
+    for (int i = 0; i < row_length; i++) {
+        if (*(row + i) > max)
+            max = *(row + i);
+    }
+    return max;
+}
+
+float calculate_row_standard_deviation(int *row, int row_length, float avg) {
+    double sum_of_dev_squared = 0;
+    for (int i = 0; i < row_length; i++) {
+        sum_of_dev_squared += pow(*(row + i) - avg, 2);
+    }
+    return (float) sqrt(sum_of_dev_squared / (float) row_length);
+}
+
+int statistics_row(int **ptr, struct statistic_t **stats) {
+    if (ptr == NULL || stats == NULL) {
+        return -1;
+    }
+
+    int row_amount = calculate_row_amount(ptr);
+    *stats = malloc(sizeof(struct statistic_t) * row_amount);
+    if (*stats == NULL) {
+        return -2;
+    }
+
+    for (int i = 0; i < row_amount; i++) {
+        int row_length = calculate_row_length(ptr, i);
+        if (row_length == 0) {
+            (*(stats)+i)->avg = -1;
+            (*(stats)+i)->min = -1;
+            (*(stats)+i)->max = -1;
+            (*(stats)+i)->range = -1;
+            (*(stats)+i)->standard_deviation = -1;
+        }
+        else {
+            (*(stats)+i)->avg = calculate_row_avg(*(ptr + i), row_length);
+            (*(stats)+i)->min = find_row_min(*(ptr + i), row_length);
+            (*(stats)+i)->max = find_row_max(*(ptr + i), row_length);
+            (*(stats)+i)->range = (*(stats)+i)->max - (*(stats)+i)->min;
+            (*(stats)+i)->standard_deviation = calculate_row_standard_deviation(*(ptr + i), row_length, (*(stats)+i)->avg);
+        }
+    }
+
+    return row_amount;
+}
+
+void display_stats(struct statistic_t *stats, int stats_amount) {
+    for (int i = 0; i < stats_amount; i++) {
+        printf("%d %d %d %.2f %.2f\n", (stats+i)->min, (stats+i)->max, (stats+i)->range,
+            (stats+i)->avg, (stats+i)->standard_deviation);
+    }
 }
