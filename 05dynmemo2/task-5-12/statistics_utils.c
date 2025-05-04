@@ -105,6 +105,7 @@ int load_txt(const char *filename, int ***ptr) {
     int row_amount = calculate_row_amount_txt(file);
 
     if (row_amount <= 0) {
+        fclose(file);
         return 3;
     }
 
