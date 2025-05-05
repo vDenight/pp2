@@ -46,6 +46,7 @@ int main(void) {
             printf("Failed to allocate memory");
             return 8;
         default:
+            display(table);
             break;
     }
 
