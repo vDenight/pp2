@@ -156,7 +156,7 @@ int calculate_row_amount_bin(FILE *file) {
     int row_amount = 0;
     long old_pos = ftell(file);
     fseek(file, 0, SEEK_SET);
-    int read_number;
+    int read_number = 0;
 
     while (fread(&read_number, sizeof(int), 1, file) == 1) {
         if (read_number == -1) {
@@ -171,7 +171,7 @@ int calculate_row_amount_bin(FILE *file) {
 int calculate_row_length_bin(FILE *file) {
     long old_pos = ftell(file);
     int row_length = 0;
-    int read_number;
+    int read_number = 0;
 
     while (fread(&read_number, sizeof(int), 1, file) == 1) {
         if (read_number == -1) {
