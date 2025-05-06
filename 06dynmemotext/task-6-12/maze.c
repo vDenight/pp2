@@ -9,7 +9,7 @@
 
 int calculate_row_length_file(FILE* file) {
     int row_length = 0;
-    char c;
+    int c;
     while ((c = fgetc(file)) != EOF && c != '\n') {
         row_length++;
     }
@@ -19,7 +19,7 @@ int calculate_row_length_file(FILE* file) {
 
 int calculate_row_amount_file(FILE* file) {
     int row_amount = 0;
-    char c;
+    int c = {0};
     char prev_char = {0};
     while (1) {
         prev_char = c;
@@ -43,7 +43,7 @@ int validate_maze_file(FILE* file, int row_length, int row_amount) {
         return -5;
     }
 
-    char c;
+    int c;
     _Bool b_present = 0;
     for (int i = 0; i < row_amount; i++) {
         for (int j = 0; j < row_length; j++) {
@@ -202,7 +202,7 @@ int validate_maze_array(char** maze, int row_length, int row_amount) {
         return -6; // too many rows
     }
 
-    return 0;
+    return b_present ? 0 : -1;
 }
 
 int solve_maze(char**maze, int x, int y) {
