@@ -2,6 +2,8 @@
 #include "crosswords.h"
 
 int main(void) {
-    printf("Hello, World!\n");
+    char** words;
+    create_leading_word_cross("JACEK", "PLACE", &words);
+    display(words);
     return 0;
 }
