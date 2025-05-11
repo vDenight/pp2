@@ -16,6 +16,10 @@ int array_push_back(struct array_t *a, int value);
 void array_display(const struct array_t *a);
 void array_destroy(struct array_t *a);
 
+int array_create_struct(struct array_t **a, int N);
+void array_destroy_struct(struct array_t **a);
+int array_remove_item(struct array_t *a, int value);
+
 enum array_codes {
     ARRAY_CREATE_OK = 0,
     ARRAY_CREATE_INCORRECT_DATA = 1,
