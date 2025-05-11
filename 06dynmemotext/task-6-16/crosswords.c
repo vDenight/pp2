@@ -208,10 +208,7 @@ int create_double_leading_word_cross(const char *first, const char *second, cons
     int min_row_length = get_cross_vert_x(*first_cross) + 1; // actual numer
     int medium_row_length = get_cross_horiz_len(*first_cross) + get_cross_vert_x(*second_cross) + 1 + 3; // three spaces
     int max_row_length = get_cross_horiz_len(*first_cross) + get_cross_horiz_len(*second_cross) + 3;
-    printf("%d %d %d\n", get_cross_horiz_len(*first_cross), get_cross_horiz_len(*second_cross), get_cross_vert_x(*second_cross));
     int max_row_length_index = f_horiz_y > s_horiz_y ? f_horiz_y : s_horiz_y;
-
-    printf("%d %d %d\n", min_row_length, medium_row_length, max_row_length);
 
     int i = 0;
     for (; i < f_upper_part - s_upper_part; i++) {
@@ -295,10 +292,11 @@ int create_double_leading_word_cross(const char *first, const char *second, cons
     int y_displacement = f_upper_part - s_upper_part;
     int x_displacement = get_cross_horiz_len(*first_cross) + 3;
 
+    int current_char_index = 0;
+    int double_y_displacement = y_displacement < 0 ? -y_displacement : 0;
     // copy the first cross
     for (int j = 0; j < f_vert_len; j++) {
-        int current_char_index = 0;
-        int double_y_displacement = y_displacement < 0 ? -y_displacement : 0;
+        current_char_index = 0;
         while (*(*(*first_cross + j) + current_char_index)) {
             memcpy(*(*result + j + double_y_displacement) + current_char_index,
                    *(*first_cross + j) + current_char_index, sizeof(char));
@@ -307,9 +305,9 @@ int create_double_leading_word_cross(const char *first, const char *second, cons
     }
 
     // coping the second cross
+    double_y_displacement = y_displacement > 0 ? y_displacement : 0;
     for (int j = 0; j < s_vert_len; j++) {
-        int current_char_index = 0;
-        int double_y_displacement = y_displacement > 0 ? y_displacement : 0;
+        current_char_index = 0;
         while (*(*(*second_cross + j) + current_char_index)) {
             memcpy(*(*result + j + double_y_displacement) + current_char_index + x_displacement,
                    *(*second_cross + j) + current_char_index, sizeof(char));
