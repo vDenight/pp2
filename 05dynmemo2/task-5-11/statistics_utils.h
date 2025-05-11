@@ -19,10 +19,10 @@ struct statistic_t
     int range;
 };
 
-int load(const char *filename, int ***ptr, enum save_format_t format);
-int statistics_row(int **ptr, struct statistic_t **stats);
-void destroy(int ***ptr);
+int statistics(int **ptr, struct statistic_t **stats);
 void display(int **ptr);
+int save(const char *filename, int **ptr, enum save_format_t format);
+void destroy(int ***ptr);
 
 void display_stats(struct statistic_t *stats, int stats_amount);
 
