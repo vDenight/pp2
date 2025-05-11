@@ -23,24 +23,6 @@ void display(int **ptr) {
     }
 }
 
-void destroy(int ***ptr) {
-    if (ptr == NULL) {
-        return;
-    }
-
-    if (*ptr == NULL) {
-        return;
-    }
-
-    int** ptr_cursor = *ptr;
-
-    while (*ptr_cursor != NULL) {
-        free(*ptr_cursor);
-        ptr_cursor++;
-    }
-    free(*ptr);
-}
-
 int calculate_row_amount(int **ptr) {
     int row_amount = 0;
     while (*ptr != NULL) {
@@ -127,7 +109,7 @@ float calculate_standard_deviation(int** ptr, float avg) {
             sum_of_dev_squared += pow((float) *(*(ptr + i) + j) - avg, 2);
         }
     }
-    return (float) sqrt(sum_of_dev_squared / (float) row_length);
+    return (float) sqrt(sum_of_dev_squared / (float) num_amount);
 }
 
 int statistics(int **ptr, struct statistic_t **stats) {
@@ -159,8 +141,11 @@ int statistics(int **ptr, struct statistic_t **stats) {
 
 void display_stats(struct statistic_t *stats, int stats_amount) {
     for (int i = 0; i < stats_amount; i++) {
-        printf("%d %d %d %.2f %.2f\n", (stats+i)->min, (stats+i)->max, (stats+i)->range,
-            (stats+i)->avg, (stats+i)->standard_deviation);
+        printf("%d\n", (stats+i)->min);
+        printf("%d\n", (stats+i)->max);
+        printf("%d\n", (stats+i)->range);
+        printf("%02f\n", (stats+i)->avg);
+        printf("%02f\n", (stats+i)->standard_deviation);
     }
 }
 
@@ -168,16 +153,13 @@ int save_txt(const char *filename, int **ptr);
 int save_bin(const char *filename, int **ptr);
 
 int save(const char *filename, int **ptr, enum save_format_t format) {
-    if (filename == NULL || ptr == NULL) return 1;
 
-    switch (format) {
-        fmt_text:
-            return save_txt(filename, ptr);
-        fmt_binary:
-            return save_bin(filename, ptr);
-        default:
-            return 1;
+    if (filename == NULL || ptr == NULL) {
+        return 1;
     }
+    if (format == fmt_text) return save_txt(filename, ptr);
+    if (format == fmt_binary) return save_bin(filename, ptr);
+    return 1;
 }
 
 int save_txt(const char *filename, int **ptr) {
@@ -215,8 +197,6 @@ int save_bin(const char *filename, int **ptr) {
         row_length = calculate_row_length(ptr, i);
         fwrite(*(ptr + i), sizeof(int), row_length + 1, file);
     }
-    const void* null_pointer = NULL;
-    fwrite(null_pointer, sizeof(void*), 1, file);
 
     fclose(file);
     return 0;
