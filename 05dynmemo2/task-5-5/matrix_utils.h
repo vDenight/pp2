@@ -13,7 +13,7 @@ struct matrix_t{
 
 int matrix_create(struct matrix_t *m, int width, int height);
 int matrix_read(struct matrix_t *m);
-// void matrix_display(const struct matrix_t *m);
+void matrix_display(const struct matrix_t *m);
 void matrix_destroy(struct matrix_t *m);
 
 struct matrix_t* matrix_create_struct(int width, int height);

@@ -54,18 +54,18 @@ int matrix_read(struct matrix_t *m) {
     return READ_OK;
 }
 
-// void matrix_display(const struct matrix_t *m) {
-//     if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1) {
-//         return;
-//     }
-//
-//     for (int i = 0; i < m->height; i++) {
-//         for (int j = 0; j < m->width; j++) {
-//             printf("%d ", *(*(m->ptr + i) + j));
-//         }
-//         printf("\n");
-//     }
-// }
+void matrix_display(const struct matrix_t *m) {
+    if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1) {
+        return;
+    }
+
+    for (int i = 0; i < m->height; i++) {
+        for (int j = 0; j < m->width; j++) {
+            printf("%d ", *(*(m->ptr + i) + j));
+        }
+        printf("\n");
+    }
+}
 
 void matrix_destroy(struct matrix_t *m) {
     if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1) {

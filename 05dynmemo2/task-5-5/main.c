@@ -9,8 +9,8 @@ enum main_code {
     INCORRECT_INPUT = 1,
     INCORRECT_INPUT_DATA = 2,
     ALLOC_FAIL = 8,
-    UNSUPPORTED_FAIL_FORMAT = 5,
-    CANT_CREATE_FILE = 7
+    UNSUPPORTED_FAIL_FORMAT = 7,
+    CANT_CREATE_FILE = 5
 };
 
 enum file_format {
@@ -22,7 +22,7 @@ enum file_format {
 enum file_format read_format(char* filename);
 
 int main(void) {
-    struct matrix_t* matrix_point = {0};
+    struct matrix_t* matrix_point;
 
     printf("Podaj szerokość i wysokość: ");
 
@@ -53,24 +53,25 @@ int main(void) {
         return INCORRECT_INPUT;
     }
 
-    struct matrix_t* t_matrix_point = matrix_transpose(matrix_point);
-
-    if (t_matrix_point == NULL) {
+    char* buffer = malloc(40 * sizeof(char));
+    if (buffer == NULL) {
         printf("Failed to allocate memory");
         matrix_destroy_struct(&matrix_point);
         return ALLOC_FAIL;
     }
-    matrix_destroy_struct(&matrix_point);
-
-    char* buffer = malloc(41 * sizeof(char));
-    if (buffer == NULL) {
-        printf("Failed to allocate memory");
-        matrix_destroy_struct(&t_matrix_point);
-        return ALLOC_FAIL;
-    }
 
     printf("Podaj sciezke do pliku: ");
-    scanf("%40s", buffer);
+    scanf("%39s", buffer);
+
+    struct matrix_t* t_matrix_point = matrix_transpose(matrix_point);
+
+    if (t_matrix_point == NULL) {
+        printf("Failed to allocate memory");
+        free(buffer);
+        matrix_destroy_struct(&matrix_point);
+        return ALLOC_FAIL;
+    }
+    matrix_destroy_struct(&matrix_point);
 
     enum file_format format = read_format(buffer);
     int save_result = 0;
@@ -94,10 +95,11 @@ int main(void) {
     if (save_result == SAVE_FILE_OPEN_ERROR) {
         matrix_destroy_struct(&t_matrix_point);
         printf("Couldn't create file");
+        return CANT_CREATE_FILE;
     }
 
     printf("File saved");
-
+    matrix_display(NULL);
     return OK;
 }
 
