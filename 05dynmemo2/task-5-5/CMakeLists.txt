@@ -4,5 +4,5 @@ project(task_5_5 C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(task_5_5 main.c
-		matrix.h
-		matrix.c)
+		matrix_utils.h
+		matrix_utils.c)
