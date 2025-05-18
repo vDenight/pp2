@@ -178,4 +178,92 @@ struct matrix_t* matrix_multiply(const struct matrix_t *m1, const struct matrix_
     return result;
 }
 
+struct matrix_t* matrix_load_b(const char *filename, int *err_code) {
+    if (filename == NULL) {
+        if (err_code != NULL) *err_code = LOAD_WRONG_INPUT;
+        return NULL;
+    }
+
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        if (err_code != NULL) *err_code = LOAD_FILE_ERROR;
+        return NULL;
+    }
+
+    int width = 0, height = 0;
+    if (fread(&width, sizeof(int), 1, file) != 1 ||
+        fread(&height, sizeof(int), 1, file) != 1 ||
+        width < 1 || height < 1) {
+        if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
+        fclose(file);
+        return NULL;
+    }
+
+    // lets create struct now
+    struct matrix_t* m = matrix_create_struct(width, height);
+    if (m == NULL) {
+        if (err_code != NULL) *err_code = LOAD_ALLOC_FAIL;
+        fclose(file);
+        return NULL;
+    }
+
+    for (int i = 0; i < m->height; i++) {
+        for (int j = 0; j < m->width; j++) {
+            if (fread(*(m->ptr + i) + j, sizeof(int), 1, file) != 1) {
+                if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
+                fclose(file);
+                matrix_destroy_struct(&m);
+                return NULL;
+            }
+        }
+    }
+
+    fclose(file);
+    return m;
+}
+
+struct matrix_t* matrix_load_t(const char *filename, int *err_code) {
+    if (filename == NULL) {
+        if (err_code != NULL) *err_code = LOAD_WRONG_INPUT;
+        return NULL;
+    }
+
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        if (err_code != NULL) *err_code = LOAD_FILE_ERROR;
+        return NULL;
+    }
+
+    int width = 0, height = 0;
+    if (fread(&width, sizeof(int), 1, file) != 1 ||
+        fread(&height, sizeof(int), 1, file) != 1 ||
+        width < 1 || height < 1) {
+        if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
+        fclose(file);
+        return NULL;
+        }
+
+    // lets create struct now
+    struct matrix_t* m = matrix_create_struct(width, height);
+    if (m == NULL) {
+        if (err_code != NULL) *err_code = LOAD_ALLOC_FAIL;
+        fclose(file);
+        return NULL;
+    }
+
+    for (int i = 0; i < m->height; i++) {
+        for (int j = 0; j < m->width; j++) {
+            if (fread(*(m->ptr + i) + j, sizeof(int), 1, file) != 1) {
+                if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
+                fclose(file);
+                matrix_destroy_struct(&m);
+                return NULL;
+            }
+        }
+    }
+
+    fclose(file);
+    return m;
+}
+
 

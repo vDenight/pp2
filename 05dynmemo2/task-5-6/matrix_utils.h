@@ -27,16 +27,21 @@ struct matrix_t* matrix_add(const struct matrix_t *m1, const struct matrix_t *m2
 struct matrix_t* matrix_subtract(const struct matrix_t *m1, const struct matrix_t *m2);
 struct matrix_t* matrix_multiply(const struct matrix_t *m1, const struct matrix_t *m2);
 
+struct matrix_t* matrix_load_b(const char *filename, int *err_code);
+struct matrix_t* matrix_load_t(const char *filename, int *err_code);
+
 enum matrix_create_code {
     CREATE_OK = 0,
     CREATE_WRONG_INPUT = 1,
     CREATE_ALLOC_FAIL = 2
 };
 
-enum matrix_read_code {
-    READ_OK = 0,
-    READ_WRONG_INPUT = 1,
-    READ_WRONG_FORMAT = 2
+enum matrix_load_code {
+    LOAD_OK = 0,
+    LOAD_WRONG_INPUT = 1,
+    LOAD_FILE_ERROR = 2,
+    LOAD_FILE_CORRUPTED = 3,
+    LOAD_ALLOC_FAIL = 4
 };
 
 enum matrix_save_code {
