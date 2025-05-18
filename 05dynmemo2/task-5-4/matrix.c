@@ -25,7 +25,7 @@ int matrix_create(struct matrix_t *m, int width, int height) {
         *(m->ptr + i) = malloc(width * sizeof(int));
         if (*(m->ptr + i) == NULL) {
             for (int j = 0; j < i; j++) {
-                free(*(m->ptr + i));
+                free(*(m->ptr + j));
             }
             free(m->ptr);
             return CREATE_ALLOC_FAIL;
@@ -46,7 +46,7 @@ int matrix_read(struct matrix_t *m) {
         for (int j = 0; j < m->width; j++) {
             scanf_val = scanf("%d", &scanned);
             if (scanf_val != 1) {
-                return READ_WRONG_INPUT;
+                return READ_WRONG_FORMAT;
             }
             *(*(m->ptr + i) + j) = scanned;
         }
