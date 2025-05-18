@@ -35,25 +35,6 @@ int matrix_create(struct matrix_t *m, int width, int height) {
     return CREATE_OK;
 }
 
-int matrix_read(struct matrix_t *m) {
-    if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1) {
-        return READ_WRONG_INPUT;
-    }
-
-    int scanf_val = 0;
-    int scanned = 0;
-    for (int i = 0; i < m->height; i++) {
-        for (int j = 0; j < m->width; j++) {
-            scanf_val = scanf("%d", &scanned);
-            if (scanf_val != 1) {
-                return READ_WRONG_FORMAT;
-            }
-            *(*(m->ptr + i) + j) = scanned;
-        }
-    }
-    return READ_OK;
-}
-
 void matrix_display(const struct matrix_t *m) {
     if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1) {
         return;
@@ -94,18 +75,6 @@ void matrix_destroy_struct(struct matrix_t **m) {
     matrix_destroy(*m);
     free(*m);
     *m = NULL;
-}
-
-struct matrix_t* matrix_transpose(const struct matrix_t *m) {
-    if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1) return NULL;
-    struct matrix_t *t = matrix_create_struct(m->height, m->width);
-    if (t == NULL) return NULL;
-    for (int i = 0; i < m->height; i++) {
-        for (int j = 0; j < m->width; j++) {
-            *(*(t->ptr + j) + i) = *(*(m->ptr + i) + j);
-        }
-    }
-    return t;
 }
 
 int matrix_save_b(const struct matrix_t *m, const char *filename) {
