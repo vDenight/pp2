@@ -77,40 +77,6 @@ void matrix_destroy_struct(struct matrix_t **m) {
     *m = NULL;
 }
 
-int matrix_save_b(const struct matrix_t *m, const char *filename) {
-    if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1 || filename == NULL) return SAVE_WRONG_INPUT;
-
-    FILE *file = fopen(filename, "wb");
-    if (file == NULL) return SAVE_FILE_OPEN_ERROR;
-    fwrite(&(m->width), sizeof(int), 1, file);
-    fwrite(&(m->height), sizeof(int), 1, file);
-
-    for (int i = 0; i < m->height; i++) {
-        for (int j = 0; j < m->width; j++) {
-            fwrite((*(m->ptr + i) + j), sizeof(int), 1, file);
-        }
-    }
-    fclose(file);
-    return SAVE_OK;
-}
-
-int matrix_save_t(const struct matrix_t *m, const char *filename) {
-    if (m == NULL || m->ptr == NULL || m->width < 1 || m->height < 1 || filename == NULL) return SAVE_WRONG_INPUT;
-
-    FILE *file = fopen(filename, "w");
-    if (file == NULL) return SAVE_FILE_OPEN_ERROR;
-    fprintf(file, "%d %d\n", m->width, m->height);
-
-    for (int i = 0; i < m->height; i++) {
-        for (int j = 0; j < m->width; j++) {
-            fprintf(file, "%d ", *(*(m->ptr + i) + j));
-        }
-        fprintf(file, "\n");
-    }
-    fclose(file);
-    return SAVE_OK;
-}
-
 struct matrix_t* matrix_copy(const struct matrix_t *copy) {
     if (copy == NULL || copy->ptr == NULL || copy->width < 1 || copy->height < 1) return NULL;
     struct matrix_t *m = matrix_create_struct(copy->width, copy->height);
@@ -186,7 +152,7 @@ struct matrix_t* matrix_load_b(const char *filename, int *err_code) {
 
     FILE *file = fopen(filename, "rb");
     if (file == NULL) {
-        if (err_code != NULL) *err_code = LOAD_FILE_ERROR;
+        if (err_code != NULL) *err_code = LOAD_OPEN_FILE_ERROR;
         return NULL;
     }
 
@@ -230,13 +196,12 @@ struct matrix_t* matrix_load_t(const char *filename, int *err_code) {
 
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        if (err_code != NULL) *err_code = LOAD_FILE_ERROR;
+        if (err_code != NULL) *err_code = LOAD_OPEN_FILE_ERROR;
         return NULL;
     }
 
     int width = 0, height = 0;
-    if (fread(&width, sizeof(int), 1, file) != 1 ||
-        fread(&height, sizeof(int), 1, file) != 1 ||
+    if (fscanf(file, "%d %d", &width, &height) != 2 ||
         width < 1 || height < 1) {
         if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
         fclose(file);
@@ -253,7 +218,7 @@ struct matrix_t* matrix_load_t(const char *filename, int *err_code) {
 
     for (int i = 0; i < m->height; i++) {
         for (int j = 0; j < m->width; j++) {
-            if (fread(*(m->ptr + i) + j, sizeof(int), 1, file) != 1) {
+            if (fscanf(file, "%d", *(m->ptr + i) + j) != 1) {
                 if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
                 fclose(file);
                 matrix_destroy_struct(&m);

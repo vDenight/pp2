@@ -7,10 +7,10 @@
 enum main_code {
     OK = 0,
     INCORRECT_INPUT = 1,
-    INCORRECT_INPUT_DATA = 2,
     ALLOC_FAIL = 8,
     UNSUPPORTED_FAIL_FORMAT = 7,
-    CANT_CREATE_FILE = 5
+    FILE_CORRUPT = 6,
+    CANNOT_OPEN_FILE = 4
 };
 
 enum file_format {
@@ -22,84 +22,117 @@ enum file_format {
 enum file_format read_format(char* filename);
 
 int main(void) {
-    struct matrix_t* matrix_point;
+    char* buffer = NULL;
+    struct matrix_t* m1, *m2;
+    int err;
 
-    printf("Podaj szerokość i wysokość: ");
-
-    int scanf_val = 0, height = 0, width = 0;
-    scanf_val = scanf("%d %d", &width, &height);
-
-    if (scanf_val != 2) {
-        printf("Incorrect input");
-        return INCORRECT_INPUT;
-    }
-    if (width < 1 || height < 1) {
-        printf("Incorrect input data");
-        return INCORRECT_INPUT_DATA;
-    }
-
-    matrix_point = matrix_create_struct(width, height);
-
-    if (matrix_point == NULL) {
-        printf("Failed to allocate memory");
-        return ALLOC_FAIL;
-    }
-
-    printf("Podaj wartości: ");
-    int read_val = matrix_read(matrix_point);
-    if (read_val == READ_WRONG_FORMAT) {
-        printf("Incorrect input");
-        matrix_destroy_struct(&matrix_point);
-        return INCORRECT_INPUT;
-    }
-
-    char* buffer = malloc(40 * sizeof(char));
+    buffer = malloc(20 * sizeof(char));
     if (buffer == NULL) {
         printf("Failed to allocate memory");
-        matrix_destroy_struct(&matrix_point);
         return ALLOC_FAIL;
     }
 
-    printf("Podaj sciezke do pliku: ");
-    scanf("%39s", buffer);
-
-    struct matrix_t* t_matrix_point = matrix_transpose(matrix_point);
-
-    if (t_matrix_point == NULL) {
-        printf("Failed to allocate memory");
-        free(buffer);
-        matrix_destroy_struct(&matrix_point);
-        return ALLOC_FAIL;
-    }
-    matrix_destroy_struct(&matrix_point);
-
+    printf("Podaj nazwe pierwszego pliku: ");
+    scanf("%19s", buffer);
     enum file_format format = read_format(buffer);
-    int save_result = 0;
+
     switch (format) {
+        case TEXT:
+            m1 = matrix_load_t(buffer, &err);
+            break;
+        case BINARY:
+            m1 = matrix_load_b(buffer, &err);
+            break;
         case UNSUPPORTED:
             printf("Unsupported file format");
             free(buffer);
-            matrix_destroy_struct(&t_matrix_point);
             return UNSUPPORTED_FAIL_FORMAT;
-        case BINARY:
-            save_result = matrix_save_b(t_matrix_point, buffer);
-            break;
+    }
+
+    switch (err) {
+        case LOAD_ALLOC_FAIL:
+            printf("Failed to allocate memory");
+            free(buffer);
+            return ALLOC_FAIL;
+        case LOAD_FILE_CORRUPTED:
+            printf("File corrupted");
+            free(buffer);
+            return FILE_CORRUPT;
+        case LOAD_OPEN_FILE_ERROR:
+            printf("Couldn't open file");
+            free(buffer);
+            return CANNOT_OPEN_FILE;
+        default:
+    }
+
+    printf("Podaj nazwe drugiego pliku: ");
+    scanf("%19s", buffer);
+    format = read_format(buffer);
+
+    switch (format) {
         case TEXT:
-            save_result = matrix_save_t(t_matrix_point, buffer);
+            m2 = matrix_load_t(buffer, &err);
             break;
+        case BINARY:
+            m2 = matrix_load_b(buffer, &err);
+            break;
+        case UNSUPPORTED:
+            printf("Unsupported file format");
+            free(buffer);
+            matrix_destroy_struct(&m1);
+            return UNSUPPORTED_FAIL_FORMAT;
     }
 
-    free(buffer);
-    matrix_destroy_struct(&t_matrix_point);
-
-    if (save_result == SAVE_FILE_OPEN_ERROR) {
-        matrix_destroy_struct(&t_matrix_point);
-        printf("Couldn't create file");
-        return CANT_CREATE_FILE;
+    switch (err) {
+        case LOAD_ALLOC_FAIL:
+            printf("Failed to allocate memory");
+            free(buffer);
+            matrix_destroy_struct(&m1);
+            return ALLOC_FAIL;
+        case LOAD_FILE_CORRUPTED:
+            printf("File corrupted");
+            free(buffer);
+            matrix_destroy_struct(&m1);
+            return FILE_CORRUPT;
+        case LOAD_OPEN_FILE_ERROR:
+            printf("Couldn't open file");
+            free(buffer);
+            matrix_destroy_struct(&m1);
+            return CANNOT_OPEN_FILE;
+        default:
     }
 
-    printf("File saved");
-    matrix_display(NULL);
+    free(buffer); // no longer needed
+
+    struct matrix_t* result;
+
+    result = matrix_add(m1, m2);
+    if (!result) {
+        printf("Error\n");
+    } else {
+        matrix_display(result);
+        matrix_destroy_struct(&result);
+    }
+
+    result = matrix_subtract(m1, m2);
+    if (!result) {
+        printf("Error\n");
+    } else {
+        matrix_display(result);
+        matrix_destroy_struct(&result);
+    }
+
+    result = matrix_multiply(m1, m2);
+    if (!result) {
+        printf("Error\n");
+    } else {
+        matrix_display(result);
+        matrix_destroy_struct(&result);
+    }
+
+    matrix_destroy_struct(&m1);
+    matrix_destroy_struct(&m2);
+
     return OK;
 }
 
