@@ -137,7 +137,7 @@ struct matrix_t* matrix_multiply(const struct matrix_t *m1, const struct matrix_
             for (int k = 0; k < m1->width; ++k) {
                 sum += *(*(m1->ptr + i) + k) * *(*(m2->ptr + k) + j); // :OOO
             }
-            result->ptr[i][j] = sum;
+            *(*(result->ptr + i) + j) = sum;
         }
     }
 
@@ -174,17 +174,17 @@ struct matrix_t* matrix_load_b(const char *filename, int *err_code) {
     }
 
     for (int i = 0; i < m->height; i++) {
-        for (int j = 0; j < m->width; j++) {
-            if (fread(*(m->ptr + i) + j, sizeof(int), 1, file) != 1) {
-                if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
-                fclose(file);
-                matrix_destroy_struct(&m);
-                return NULL;
-            }
+        int fread_val = (int) fread(*(m->ptr + i), sizeof(int), m->width, file);
+        if (fread_val != m->width) {
+            if (err_code != NULL) *err_code = LOAD_FILE_CORRUPTED;
+            fclose(file);
+            matrix_destroy_struct(&m);
+            return NULL;
         }
     }
 
     fclose(file);
+    if (err_code) *err_code = 0;
     return m;
 }
 
@@ -228,6 +228,7 @@ struct matrix_t* matrix_load_t(const char *filename, int *err_code) {
     }
 
     fclose(file);
+    if (err_code) *err_code = 0;
     return m;
 }
 

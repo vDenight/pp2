@@ -20,6 +20,7 @@ enum file_format {
 };
 
 enum file_format read_format(char* filename);
+void get_filename(char* buffer);
 
 int main(void) {
     char* buffer = NULL;
@@ -33,7 +34,7 @@ int main(void) {
     }
 
     printf("Podaj nazwe pierwszego pliku: ");
-    scanf("%19s", buffer);
+    get_filename(buffer);
     enum file_format format = read_format(buffer);
 
     switch (format) {
@@ -62,11 +63,11 @@ int main(void) {
             printf("Couldn't open file");
             free(buffer);
             return CANNOT_OPEN_FILE;
-        default:
+        default: break;
     }
 
     printf("Podaj nazwe drugiego pliku: ");
-    scanf("%19s", buffer);
+    get_filename(buffer);
     format = read_format(buffer);
 
     switch (format) {
@@ -99,7 +100,7 @@ int main(void) {
             free(buffer);
             matrix_destroy_struct(&m1);
             return CANNOT_OPEN_FILE;
-        default:
+        default: break;
     }
 
     free(buffer); // no longer needed
@@ -144,4 +145,16 @@ enum file_format read_format(char* filename) {
     if (strcmp(dot + 1, "bin") == 0) return BINARY;
     if (strcmp(dot + 1, "txt") == 0) return TEXT;
     return UNSUPPORTED;
+}
+
+void get_filename(char* buffer) {
+    int c;
+    int count = 0;
+    while ((c = getchar()) != '\n') {
+        if (count < 19) {
+            *(buffer + count) = (char) c;
+            count++;
+        }
+    }
+    *(buffer + count) = '\0';
 }
