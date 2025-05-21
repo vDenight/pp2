@@ -20,7 +20,7 @@ struct dictionary_t* create_dictionary(int N, int *err_code) {
         return NULL;
     }
 
-    my_dict->wc = malloc(sizeof(struct word_count_t) * N);
+    my_dict->wc = calloc(sizeof(struct word_count_t), N);
     if (my_dict->wc == NULL) {
         if (err_code) *err_code = CREATE_ALLOC_FAIL;
         free(my_dict);
@@ -37,15 +37,12 @@ struct dictionary_t* create_dictionary(int N, int *err_code) {
 void destroy_dictionary(struct dictionary_t** d) {
     if (d == NULL || *d == NULL || (*d)->wc == NULL || (*d)->size < 0 || (*d)->capacity < 1) return;
     for (int i = 0; i < (*d)->size; i++) {
-        if ((*d)->wc != NULL) {
-            if (((*d)->wc + i)->word != NULL) { // check if the word is null
+        if (((*d)->wc + i)->word != NULL) { // check if the word is null
             free(((*d)->wc + i)->word); // if not null free the word
             ((*d)->wc + i)->word = NULL; // set to null just in case
-            }
         }
     }
     free((*d)->wc);
-    (*d)->wc = NULL; // set to null just in case
     free(*d);
     *d = NULL;
 }
@@ -79,7 +76,7 @@ int dictionary_add_word(struct dictionary_t *d, const char *word) {
     }
 
     // set the values respectively
-    (d->wc + d->size) -> word = (char*) word;
+    (d->wc + d->size) -> word = new_word;
     (d->wc + d->size) -> counter = 1;
     d->size++;
 
