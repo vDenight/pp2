@@ -29,13 +29,18 @@ int create_array_2d_2(int ***ptr, int width, int height) {
 }
 
 void destroy_array_2d(int ***ptr, int height) {
+    if (ptr == NULL || height < 1) return;
+
     for (int i = 0; i < height; i++) {
-        free(*(*ptr + i));
+        if (*(*ptr + i)) free(*(*ptr + i));
     }
-    free(*ptr);
+    if (*ptr) free(*ptr);
+    *ptr = NULL;
 }
 
 void display_array_2d(int **ptr, int width, int height) {
+    if (ptr == NULL || *ptr == NULL || height < 1 || width < 1) return;
+
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             printf("%d ", *(*(ptr + i) + j));
@@ -45,6 +50,8 @@ void display_array_2d(int **ptr, int width, int height) {
 }
 
 int sum_array_2d(int **ptr, int width, int height) {
+    if (ptr == NULL || *ptr == NULL || height < 1 || width < 1) return -1;
+
     int sum = 0;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
@@ -55,6 +62,8 @@ int sum_array_2d(int **ptr, int width, int height) {
 }
 
 int sum_row(int *ptr, int width) {
+    if (ptr == NULL || width < 1) return -1;
+
     int sum = 0;
     for (int i = 0; i < width; i++) {
         sum += *(ptr + i);
