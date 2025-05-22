@@ -51,7 +51,8 @@ int main(void) {
         }
     }
 
-    is_empty ? printf("Nothing to show") : dictionary_display(my_dict);
+    if (is_empty) printf("Nothing to show");
+    else dictionary_display(my_dict);
 
     destroy_dictionary(&my_dict);
     free(buffer);
