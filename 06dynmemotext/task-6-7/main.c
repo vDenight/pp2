@@ -26,6 +26,7 @@ int main(void) {
     FILE* file = fopen(buffer, "r");
     if (file == NULL) {
         printf("Couldn't open file");
+        free(buffer);
         return FILE_OPEN_FAIL;
     }
 
@@ -35,6 +36,7 @@ int main(void) {
     if (err == CREATE_ALLOC_FAIL) {
         printf("Failed to allocate memory");
         free(buffer);
+        fclose(file);
         return ALLOC_FAIL;
     }
 
@@ -47,6 +49,7 @@ int main(void) {
             printf("Failed to allocate memory");
             free(buffer);
             destroy_dictionary(&my_dict);
+            fclose(file);
             return ALLOC_FAIL;
         }
     }
@@ -54,6 +57,7 @@ int main(void) {
     if (is_empty) printf("Nothing to show");
     else dictionary_display(my_dict);
 
+    fclose(file);
     destroy_dictionary(&my_dict);
     free(buffer);
     return OK;
@@ -61,7 +65,7 @@ int main(void) {
 
 _Bool get_word(FILE* file, char* buffer) {
     _Bool started = 0;
-    char current_char;
+    int current_char;
     int index = 0;
     while (1) {
 
@@ -70,13 +74,13 @@ _Bool get_word(FILE* file, char* buffer) {
             break;
         }
 
-        current_char = (char) fgetc(file);
+        current_char = fgetc(file);
 
         if (current_char == EOF && started == 0) return 0;
 
         if (isalpha(current_char)) {
             started = 1;
-            *(buffer + index) = current_char;
+            *(buffer + index) =  (char) current_char;
             index++;
         } else {
             if (started == 1) {
