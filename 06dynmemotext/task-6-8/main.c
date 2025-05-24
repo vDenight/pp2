@@ -50,6 +50,8 @@ int main(void) {
         return ALLOC_FAIL;
     }
 
+    FILE* file = NULL;
+
     switch (opt) {
         case 0:
             my_dict = load_dictionary_b(buffer, &err);
@@ -74,12 +76,12 @@ int main(void) {
                     free(filename_o);
                     printf("File corrupted");
                     return FILE_CORRUPTED;
-                default: break;
+                default: dictionary_display(my_dict); break;
             }
             break;
         case 1:
 
-            FILE* file = fopen(buffer, "r");
+            file = fopen(buffer, "r");
             if (file == NULL) {
                 printf("Couldn't open file");
                 free(buffer);
