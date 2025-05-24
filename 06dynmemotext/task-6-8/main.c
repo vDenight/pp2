@@ -14,52 +14,54 @@ _Bool get_word(FILE* file, char* buffer);
 
 int main(void) {
 
-    char* buffer = calloc(50, sizeof(char));
-    if (buffer == NULL) {
-        printf("Failed to allocate memory");
-        return ALLOC_FAIL;
-    }
-
-    printf("Podaj nazwe pliku: ");
-    scanf("%49s", buffer);
-
-    FILE* file = fopen(buffer, "r");
-    if (file == NULL) {
-        printf("Couldn't open file");
-        free(buffer);
-        return FILE_OPEN_FAIL;
-    }
-
-    int err;
-    struct dictionary_t* my_dict = create_dictionary(10, &err);
-
-    if (err == CREATE_ALLOC_FAIL) {
-        printf("Failed to allocate memory");
-        free(buffer);
-        fclose(file);
-        return ALLOC_FAIL;
-    }
-
-    _Bool is_empty = 1;
-
-    while (get_word(file, buffer)) {
-        is_empty = 0;
-        err = dictionary_add_word(my_dict, buffer);
-        if (err == ADD_ALLOC_FAIL) {
-            printf("Failed to allocate memory");
-            free(buffer);
-            destroy_dictionary(&my_dict);
-            fclose(file);
-            return ALLOC_FAIL;
-        }
-    }
-
-    if (is_empty) printf("Nothing to show");
-    else dictionary_display(my_dict);
-
-    fclose(file);
-    destroy_dictionary(&my_dict);
-    free(buffer);
+    // char* buffer = calloc(50, sizeof(char));
+    // if (buffer == NULL) {
+    //     printf("Failed to allocate memory");
+    //     return ALLOC_FAIL;
+    // }
+    //
+    // printf("Podaj nazwe pliku: ");
+    // scanf("%49s", buffer);
+    //
+    // FILE* file = fopen(buffer, "r");
+    // if (file == NULL) {
+    //     printf("Couldn't open file");
+    //     free(buffer);
+    //     return FILE_OPEN_FAIL;
+    // }
+    //
+    // int err;
+    // struct dictionary_t* my_dict = create_dictionary(10, &err);
+    //
+    // if (err == CREATE_ALLOC_FAIL) {
+    //     printf("Failed to allocate memory");
+    //     free(buffer);
+    //     fclose(file);
+    //     return ALLOC_FAIL;
+    // }
+    //
+    // _Bool is_empty = 1;
+    //
+    // while (get_word(file, buffer)) {
+    //     is_empty = 0;
+    //     err = dictionary_add_word(my_dict, buffer);
+    //     if (err == ADD_ALLOC_FAIL) {
+    //         printf("Failed to allocate memory");
+    //         free(buffer);
+    //         destroy_dictionary(&my_dict);
+    //         fclose(file);
+    //         return ALLOC_FAIL;
+    //     }
+    // }
+    //
+    // if (is_empty) printf("Nothing to show");
+    // else {
+    //     dictionary_sort_alphabetically(my_dict);
+    //     dictionary_display(my_dict);
+    // }
+    // fclose(file);
+    // destroy_dictionary(&my_dict);
+    // free(buffer);
     return OK;
 }
 

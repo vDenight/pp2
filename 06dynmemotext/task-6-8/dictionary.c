@@ -103,3 +103,136 @@ void dictionary_display(const struct dictionary_t *d) {
         printf("%s %d\n", (d->wc + i)->word, (d->wc + i)->counter);
     }
 }
+
+int word_count_compare_a(const void *a, const void *b) {
+    return strcmp(((struct word_count_t*)a)->word, ((struct word_count_t*)b)->word);
+}
+
+int word_count_compare_o(const void *a, const void *b) {
+    return ((struct word_count_t*)b)->counter - ((struct word_count_t*)a)->counter;
+}
+
+
+// will be using qsort prolly
+int dictionary_sort_alphabetically(struct dictionary_t *d) {
+    if (d == NULL || d->wc == NULL || d->size < 0 || d->capacity < 1 || d->size > d->capacity)
+        return SORT_INPUT_ERROR;
+
+    qsort(d->wc, d->size, sizeof(struct word_count_t), word_count_compare_a);
+    return SORT_OK;
+}
+
+int dictionary_sort_occurence(struct dictionary_t *d) {
+    if (d == NULL || d->wc == NULL || d->size < 0 || d->capacity < 1 || d->size > d->capacity)
+        return SORT_INPUT_ERROR;
+
+    // first alphabetically then by occurence
+    qsort(d->wc, d->size, sizeof(struct word_count_t), word_count_compare_a);
+    qsort(d->wc, d->size, sizeof(struct word_count_t), word_count_compare_o);
+    return SORT_OK;
+}
+
+int save_dictionary_b(const struct dictionary_t *d, const char *filename) {
+    if (d == NULL || d->wc == NULL || d->size < 0 || d->capacity < 1 || d->size > d->capacity
+        || filename == NULL)
+        return SAVE_INPUT_ERROR;
+
+    FILE* f = fopen(filename, "wb");
+    if (f == NULL) return SAVE_FILE_OPEN_FAIL;
+
+    // file opened first let's save the size
+    fwrite(&d->size, sizeof(int), 1, f);
+
+    // now each word
+    struct word_count_t* current_wc;
+    int current_len;
+    for (int i = 0; i < d->size; i++) {
+        current_wc = d->wc + i;
+        current_len = (int) strlen(current_wc->word);
+        fwrite(&current_len, sizeof(int), 1, f); // str len
+        fwrite(current_wc->word, sizeof(char) * current_len, 1, f); // str (no terminator)
+        fwrite(&current_wc->counter, sizeof(int), 1, f); // occurence count
+    }
+
+    fclose(f);
+
+    return SAVE_OK;
+}
+
+struct dictionary_t* load_dictionary_b(const char *filename, int *err_code) {
+    if (!filename) {
+        if (err_code) *err_code = LOAD_INPUT_ERROR;
+        return NULL;
+    }
+
+    FILE* f = fopen(filename, "rb");
+    if (!f) {
+        if (err_code) *err_code = LOAD_FILE_OPEN_FAIL;
+        return NULL;
+    }
+
+    int size = 0;
+    fread(&size, sizeof(int), 1, f);
+
+    if (size < 1) {
+        if (err_code) *err_code = LOAD_FILE_CORRUPT;
+        fclose(f);
+        return NULL;
+    }
+
+    int code;
+    struct dictionary_t* new_dict = create_dictionary(size, &code);
+    if (code == CREATE_ALLOC_FAIL) {
+        if (err_code) *err_code = LOAD_ALLOC_FAIL;
+        fclose(f);
+        return NULL;
+    }
+
+    int word_len;
+    char* new_word;
+    int word_count;
+
+    for (int i = 0; i < size; i++) {
+        code = fread(&word_len, sizeof(int), 1, f);
+        if (code != 1) {
+            if (err_code) *err_code = LOAD_FILE_CORRUPT;
+            fclose(f);
+            destroy_dictionary(&new_dict);
+            return NULL;
+        }
+        new_word = (char*) calloc((word_len + 1), sizeof(char));
+        if (new_word == NULL) {
+            if (err_code) *err_code = LOAD_ALLOC_FAIL;
+            fclose(f);
+            destroy_dictionary(&new_dict);
+            return NULL;
+        }
+        code = fread(new_word, sizeof(char) * word_len, 1, f);
+        *(new_word + word_len) = '\0';
+        if (code != 1) {
+            if (err_code) *err_code = LOAD_FILE_CORRUPT;
+            fclose(f);
+            destroy_dictionary(&new_dict);
+            free(new_word);
+            return NULL;
+        }
+        code = fread(&word_count, sizeof(int), 1, f);
+        if (code != 1) {
+            if (err_code) *err_code = LOAD_FILE_CORRUPT;
+            fclose(f);
+            destroy_dictionary(&new_dict);
+            free(new_word);
+            return NULL;
+        }
+        for (int j = 0; j < word_count; j++) {
+            dictionary_add_word(new_dict, new_word);
+        }
+
+        free(new_word);
+        new_word = NULL;
+    }
+
+    fclose(f);
+    if (err_code) *err_code = LOAD_OK;
+    return new_dict;
+}
