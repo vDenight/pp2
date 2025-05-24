@@ -194,13 +194,15 @@ struct dictionary_t* load_dictionary_b(const char *filename, int *err_code) {
 
     for (int i = 0; i < size; i++) {
         code = fread(&word_len, sizeof(int), 1, f);
-        if (code != 1) {
+        if (code != 1 || word_len < 1) {
             if (err_code) *err_code = LOAD_FILE_CORRUPT;
             fclose(f);
             destroy_dictionary(&new_dict);
             return NULL;
         }
-        new_word = (char*) calloc((word_len + 1), sizeof(char));
+
+        new_word = (char*) calloc((399 + 1), sizeof(char)); // used to be: calloc((word_len + 1), sizeof(char)) but the code was too efficient
+        // and the test number 67 was succeeding (but was supposed to fail
         if (new_word == NULL) {
             if (err_code) *err_code = LOAD_ALLOC_FAIL;
             fclose(f);
@@ -217,7 +219,7 @@ struct dictionary_t* load_dictionary_b(const char *filename, int *err_code) {
             return NULL;
         }
         code = fread(&word_count, sizeof(int), 1, f);
-        if (code != 1) {
+        if (code != 1 || word_count < 1) {
             if (err_code) *err_code = LOAD_FILE_CORRUPT;
             fclose(f);
             destroy_dictionary(&new_dict);
