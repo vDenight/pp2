@@ -12,7 +12,6 @@
 char* get_word(const char *text, char** text_end, int* error);
 
 char **split_words(const char *text) {
-
     char* text_to_get_word = (char*) text;
     char* text_after_getting = NULL;
     int err = 0;
@@ -20,6 +19,7 @@ char **split_words(const char *text) {
 
     // for now only a null then we will realloc
     char** words = calloc(1, sizeof(char*));
+    if (!words) return NULL;
 
     while (1) {
         char *new_word = get_word(text_to_get_word, &text_after_getting, &err);
@@ -44,7 +44,10 @@ char **split_words(const char *text) {
         // setting text to get word, for the next iteration
         text_to_get_word = text_after_getting;
     }
-
+    if (*words == NULL) {
+        destroy(words);
+        return NULL;
+    }
     return words;
 }
 
@@ -86,17 +89,36 @@ char* get_word(const char *text, char** text_end, int* error) {
     return new_word;
 }
 
+int words_get_size(char **words) {
+    int size = 0;
+    while (*words) {
+        size++;
+        words++;
+    }
+    return size;
+}
 
+int compare_strings(const void* s1, const void* s2) {
+    return strcmp(*(char**)s1, *(char**)s2);
+}
 
-int sort_words(char **words);
+int sort_words(char **words) {
+    if (!words) return SORT_ERROR;
+    int words_size = words_get_size(words);
+    qsort(words, words_size, sizeof(char*), compare_strings);
+    return SORT_OK;
+}
 
 void destroy(char **words) {
-    if (words) {
-        while (*words != NULL) {
-            if (*words) free(*words);
-        }
-        free(words);
+    if (words == NULL) {
+        return;
     }
+
+    int size = words_get_size(words);
+    for (int i = 0; i < size; i++) {
+        free(*(words + i));
+    }
+    free(words);
 }
 
 void display(char **words) {

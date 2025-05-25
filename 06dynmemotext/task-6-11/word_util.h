@@ -10,4 +10,9 @@ int sort_words(char **words);
 void destroy(char **words);
 void display(char **words);
 
+enum sort_code {
+    SORT_OK = 0,
+    SORT_ERROR = 1
+};
+
 #endif //WORD_UTIL_H
