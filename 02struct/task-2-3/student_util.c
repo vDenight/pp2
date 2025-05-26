@@ -4,12 +4,14 @@
 
 #include "student_util.h"
 
+#include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-struct student_t* read(struct student_t* p, int *err_code) {
+_Bool readnum(int *num);
 
+struct student_t* read(struct student_t* p, int *err_code) {
     if (!p) {if (err_code) *err_code = READ_WRONG_INPUT; return NULL;}
 
 
@@ -56,15 +58,137 @@ struct student_t* read(struct student_t* p, int *err_code) {
     if (!started || !finished) {if (err_code) *err_code = READ_ONLY_NAME; return NULL;}
 
     // now the index
-    int scanf_val = scanf("%d", &(p->index));
+    if (!readnum(&(p->index))) {if (err_code) *err_code = READ_ONLY_NAME_SURNAME; return NULL;}
 
-    if (scanf_val != 1) {if (err_code) *err_code = READ_ONLY_NAME_SURNAME; return NULL;}
+    // now adding field
+    // skip spaces
+    while ((c = getchar()) == ' ' || c == '\t') {}
+
+    started = 0;
+    finished = 0;
+
+    for (int i = 0; i < 49; i++) {
+        if (c == ',') {finished = 1; break;}
+        if (c == '\n' || c == EOF) {if (err_code) *err_code = READ_ONLY_NAME_SURNAME_INDEX; return NULL;}
+
+        *(p->field+ i) = (char) c;
+        started = 1;
+        c = getchar();
+    }
+
+    if (!finished) if (c == ',') finished = 1;
+    if (!started || !finished) {if (err_code) *err_code = READ_ONLY_NAME_SURNAME_INDEX; return NULL;}
+
+
+    // skip spaces, add faculty
+    while ((c = getchar()) == ' ' || c == '\t') {}
+
+    started = 0;
+    finished = 0;
+
+    for (int i = 0; i < 79; i++) {
+        if (c == ',') {finished = 1; break;}
+        if (c == '\n' || c == EOF) {if (err_code) *err_code = READ_TO_FIELD; return NULL;}
+
+        *(p->faculty+ i) = (char) c;
+        started = 1;
+        c = getchar();
+    }
+
+    if (!finished) if (c == ',') finished = 1;
+    if (!started || !finished) {if (err_code) *err_code = READ_TO_FIELD; return NULL;}
+
+    // now the year
+    if (!readnum(&(p->year))) {if (err_code) *err_code = READ_TO_FACULTY; return NULL;}
 
     if (err_code) *err_code = READ_OK;
     return p;
 }
 
-void show(const struct student_t* p) {
+_Bool is_vowel(char c);
+
+void display(const struct student_t* p) {
     if (!p) return;
-    printf("%s %s, %d" , p->name , p->surname, p->index);
+    if (is_vowel(*(p->field)))
+    printf("%s %s, index number: %d, was an %s student at the %s in %d.\n"
+        , p->name, p->surname, p->index, p->field, p->faculty, p->year);
+    else
+        printf("%s %s, index number: %d, was a %s student at the %s in %d.\n"
+        , p->name, p->surname, p->index, p->field, p->faculty, p->year);
+}
+
+_Bool is_vowel(char c) {
+    int c_up = toupper(c);
+    if (c_up == 'A' || c_up == 'E' || c_up == 'I' || c_up == 'O' || c_up == 'U') return 1;
+    return 0;
+}
+
+struct student_t* set(struct student_t* student, const char * name,
+                      const char * surname, int index,
+                      const char * field, const char * faculty,
+                      int year, int *err_code) {
+    if (!student || !name || ! surname || !field || !faculty) {
+        if (err_code) *err_code = 1;
+        return NULL;
+    }
+
+    if (strlen(name) > 19 || strlen(surname) > 39 || strlen(field) > 49 || strlen(faculty) > 79) {
+        if (err_code) *err_code = 1;
+        return NULL;
+    }
+
+    strcpy(student->name, name);
+    strcpy(student->surname, surname);
+    strcpy(student->field, field);
+    strcpy(student->faculty, faculty);
+    student->index = index;
+    student->year = year;
+
+    if (err_code) *err_code = 0;
+    return student;
+
+}
+
+void display_name(const struct student_t* student) {
+    if (!student) return;
+    printf("Student name: %s\n", student->name);
+}
+void display_surname(const struct student_t* student) {
+    if (!student) return;
+    printf("Student surname: %s\n", student->surname);
+}
+void display_index(const struct student_t* student) {
+    if (!student) return;
+    printf("Index: %d\n", student->index);
+}
+void display_field(const struct student_t* student) {
+    if (!student) return;
+    printf("Field: %s\n", student->field);
+}
+void display_faculty(const struct student_t* student) {
+    if (!student) return;
+    printf("Faculty: %s\n", student->faculty);
+}
+void display_year(const struct student_t* student) {
+    if (!student) return;
+    printf("Year: %d\n", student->year);
+}
+
+_Bool readnum(int* num) {
+    int c;
+    *num = 0;
+    _Bool started = 0;
+    while (1) {
+        c = getchar();
+        if ((c == '\n' || c == ',' || c == EOF) && !started) return 0;
+        if (c == '\n' || c == ',' || c == EOF) return 1;
+
+        if (c == ' ' && !started) continue;
+        if (isdigit(c)) {
+            *num = *num * 10 + (c - '0');
+            started = 1;
+        } else {
+            return 0;
+        }
+    }
 }
