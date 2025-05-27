@@ -11,18 +11,20 @@
 
 struct student_t* read(int *err_code) {
 
+    struct student_t* student = calloc(1, sizeof(struct student_t));
+    if (!student) {
+        if (err_code) *err_code = READ_ALLOC_FAIL;
+        return NULL;
+    }
+
+    printf("Podaj dane: ");
+
     int c;
     // delete the spaces at the start
     while ((c = getchar()) == ' ' || c == '\t') {}
 
     _Bool started = 0;
     _Bool finished = 0;
-
-    struct student_t* student = calloc(1, sizeof(struct student_t));
-    if (!student) {
-        if (err_code) *err_code = READ_ALLOC_FAIL;
-        return NULL;
-    }
 
     // read the name
     for (int i = 0; i < 19; i++) {

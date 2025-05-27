@@ -2,7 +2,6 @@
 #include "student_util.h"
 
 int main(void) {
-    printf("Podaj dane: \n");
 
     int err;
     struct student_t* student = read(&err);
@@ -11,7 +10,7 @@ int main(void) {
         show(student);
     } else if (err == READ_ALLOC_FAIL) {
         printf("Failed to allocate memory");
-        return err * 2;
+        return 8;
     } else {
         printf("Incorrect input");
         return err;
