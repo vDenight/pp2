@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -11,6 +12,7 @@ enum file_format {
 
 enum main_code {
     OK = 0,
+    INCORRECT_INPUT = 1,
     UNSUPPORTED_FILE_FORMAT = 7,
     COULD_NOT_CREATE_FILE = 5,
     FILE_CORRUPTED = 6,
@@ -34,21 +36,69 @@ int main(void) {
 
     printf("Enter file name:\n");
     scanf("%99s", filename);
-    int save_val;
+    int file_function_val = {0};
     enum file_format file_format = read_format(filename);
     switch (file_format) {
         case BINARY:
-            save_val = save_student_b(filename, &student);
+            file_function_val = save_student_b(filename, &student);
             break;
         case TEXT:
-            save_val = save_student_t(filename, &student);
+            file_function_val = save_student_t(filename, &student);
             break;
         case UNSUPPORTED:
             printf("Unsupported file format");
             return UNSUPPORTED_FILE_FORMAT;
     }
 
-    return err;
+    switch (file_function_val) {
+        case FILE_OK:
+            printf("File saved\n");
+            break;
+        case FILE_CANNOT_OPEN_FILE:
+            printf("Couldn't create file\n");
+            return COULD_NOT_CREATE_FILE;
+        default:
+            display_name(&student);
+            display_surname(&student);
+            display_index(&student);
+            display_field(&student);
+            display_faculty(&student);
+            display_year(&student);
+        break;
+    }
+
+    printf("Do you want to read the file (Y/N)? ");
+    getchar(); // get the newline first
+    char c;
+    scanf("%c", &c);
+    
+    if (toupper(c) == 'N') return OK;
+    if (toupper(c) == 'Y') {
+        switch (file_format) {
+            case BINARY:
+                file_function_val = load_student_b(filename, &student);
+            break;
+            case TEXT:
+                file_function_val = load_student_t(filename, &student);
+            break;
+        }
+
+        switch (file_function_val) {
+            case FILE_OK:
+                display(&student);
+                return OK;
+            case FILE_CANNOT_OPEN_FILE:
+                printf("Couldn't open file");
+                return CANNOT_OPEN_FILE;
+            case FILE_FILE_CORRUPTED:
+                printf("File corrupted");
+                return FILE_CORRUPTED;
+            default: return 2137;
+        }
+    }
+
+    printf("Incorrect input");
+    return INCORRECT_INPUT;
 }
 
 enum file_format read_format(char* filename) {
