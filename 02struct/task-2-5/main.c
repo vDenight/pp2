@@ -32,12 +32,13 @@ int main(void) {
         display(&student);
     } else {
         printf("Incorrect input\n");
+        return err;
     }
 
     printf("Enter file name:\n");
     scanf("%99s", filename);
     int file_function_val = {0};
-    enum file_format file_format = read_format(filename);
+    int file_format = read_format(filename);
     switch (file_format) {
         case BINARY:
             file_function_val = save_student_b(filename, &student);
@@ -48,6 +49,7 @@ int main(void) {
         case UNSUPPORTED:
             printf("Unsupported file format");
             return UNSUPPORTED_FILE_FORMAT;
+        default: return 2137;
     }
 
     switch (file_function_val) {
@@ -64,6 +66,7 @@ int main(void) {
             display_field(&student);
             display_faculty(&student);
             display_year(&student);
+            set(&student, "nie", "nawidze", 2137, "dante", "serio", 1337, NULL);
         break;
     }
 
