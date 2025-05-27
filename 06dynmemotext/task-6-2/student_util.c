@@ -11,7 +11,7 @@
 #include <string.h>
 
 void replace_newline_with_terminator(char* buffer);
-void strip_space(char* buffer);
+void strip_space(char* part);
 _Bool str_to_int(char* str, int* integer);
 
 struct student_t* read(int *err_code) {
@@ -35,13 +35,16 @@ struct student_t* read(int *err_code) {
 
     fgets(buffer, 100, stdin);
     replace_newline_with_terminator(buffer);
-    strip_space(buffer);
 
     char* name_part = strtok(buffer, ",");
     char* surname_part = strtok(NULL, ",");
     char* index_part = strtok(NULL, ",");
 
-    if (strlen(name_part) == 0) {
+    if (name_part) strip_space(name_part);
+    if (surname_part) strip_space(surname_part);
+    if (index_part) strip_space(index_part);
+
+    if (name_part == NULL || surname_part == NULL || strlen(name_part) == 0) {
         free(student);
         free(buffer);
         if (err_code) *err_code = READ_WRONG_INPUT;
@@ -57,7 +60,7 @@ struct student_t* read(int *err_code) {
         return NULL;
     }
 
-    if (strlen(surname_part) == 0) {
+    if (index_part == NULL || strlen(surname_part) == 0) {
         free(student->name);
         free(student);
         free(buffer);
@@ -92,13 +95,14 @@ struct student_t* read(int *err_code) {
         return NULL;
     }
 
+    if (err_code) *err_code = READ_OK;
     free(buffer);
     return student;
 }
 
 _Bool str_to_int(char* str, int* integer) {
     *integer = 0;
-    for (int i = 0; i < strlen(str); i++) {
+    for (int i = 0; i < (int) strlen(str); i++) {
         if (isdigit(*(str + i))) {
             *integer = *integer * 10 + (*(str + i) - '0');
         } else {
@@ -117,17 +121,31 @@ void replace_newline_with_terminator(char* buffer) {
     }
 }
 
-void strip_space(char* buffer) {
-    int j = 0;
+void strip_space(char* part) {
+    int len = (int) strlen(part);
+    int first_char_index = 0;
+    int last_char_index = len - 1;
 
-    for (int i = 0; i < 100; i++) {
-        if (isspace(*(buffer + i))) continue;
-
-        *(buffer + j) = *(buffer + i);
-        j++;
-
-        if (*(buffer + i) == '\0') return;
+    while (first_char_index < len && isspace(*(part + first_char_index))) {
+        first_char_index++;
     }
+
+    if (first_char_index == len) {
+        *part = '\0';
+        return;
+    }
+
+    while (last_char_index > first_char_index && isspace(*(part + last_char_index))) {
+        last_char_index--;
+    }
+
+    int new_len = last_char_index - first_char_index + 1;
+
+    if (first_char_index > 0) {
+        memmove(part, part + first_char_index, new_len);
+    }
+
+    *(part + new_len) = '\0';
 }
 
 void show(const struct student_t* p) {
@@ -138,6 +156,8 @@ void show(const struct student_t* p) {
 void destroy(struct student_t **s) {
     if (!s) return;
     if (!(*s)) return;
+    if ((*s)->name) free((*s)->name);
+    if ((*s)->surname) free((*s)->surname);
 
     free(*s);
     *s = NULL;
