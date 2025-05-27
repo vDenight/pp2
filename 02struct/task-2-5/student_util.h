@@ -28,6 +28,11 @@ void display_field(const struct student_t* student);
 void display_faculty(const struct student_t* student);
 void display_year(const struct student_t* student);
 
+int save_student_b(const char *filename, const struct student_t* s);
+int load_student_b(const char *filename, struct student_t* s);
+int save_student_t(const char *filename, const struct student_t* s);
+int load_student_t(const char *filename, struct student_t* s);
+
 enum read_code {
     READ_OK = 0,
     READ_WRONG_INPUT = 1,
@@ -36,6 +41,13 @@ enum read_code {
     READ_ONLY_NAME_SURNAME_INDEX = 4,
     READ_TO_FIELD = 5,
     READ_TO_FACULTY = 6
+};
+
+enum file_code {
+    FILE_OK = 0,
+    FILE_WRONG_INPUT = 1,
+    FILE_CANNOT_OPEN_FILE = 2,
+    FILE_FILE_CORRUPTED = 3
 };
 
 #endif //STUDENT_UTIL_H

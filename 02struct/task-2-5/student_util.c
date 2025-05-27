@@ -192,3 +192,97 @@ _Bool readnum(int* num) {
         }
     }
 }
+
+int save_student_b(const char *filename, const struct student_t* s) {
+    if (filename == NULL || s == NULL) return FILE_WRONG_INPUT;
+
+    FILE* f = fopen(filename, "wb");
+    if (!f) return FILE_CANNOT_OPEN_FILE;
+
+    fwrite(s, sizeof(*s), 1, f);
+
+    fclose(f);
+    return FILE_OK;
+}
+
+int load_student_b(const char *filename, struct student_t* s) {
+    if (filename == NULL || s == NULL) return FILE_WRONG_INPUT;
+
+    FILE* f = fopen(filename, "rb");
+    if (!f) return FILE_CANNOT_OPEN_FILE;
+
+    if (!fread(s, sizeof(*s), 1, f)) {fclose(f); return FILE_FILE_CORRUPTED;}
+
+    fclose(f);
+    return FILE_OK;
+}
+
+int save_student_t(const char *filename, const struct student_t* s) {
+    if (filename == NULL || s == NULL) return FILE_WRONG_INPUT;
+
+    FILE* f = fopen(filename, "w");
+    if (!f) return FILE_CANNOT_OPEN_FILE;
+
+    fprintf(f, "%s, %s, %d, %s, %s, %d",
+        s->name, s->surname, s->index, s->field, s->faculty, s->year);
+
+    fclose(f);
+    return FILE_OK;
+}
+
+int load_student_t(const char *filename, struct student_t* s) {
+    if (filename == NULL || s == NULL) return FILE_WRONG_INPUT;
+
+    FILE* f = fopen(filename, "r");
+    if (!f) return FILE_CANNOT_OPEN_FILE;
+
+    memset(s, 0, sizeof(*s));
+
+    // read name
+    int c;
+    for (int i = 0; i < 19; i ++) {
+        c = fgetc(f);
+        if (c == ',') break;
+        if (c == EOF) {fclose(f); return FILE_FILE_CORRUPTED;}
+        *(s->name + i) = (char) c;
+    }
+
+    //get the space
+    if (fgetc(f) != ' ') {fclose(f); return FILE_FILE_CORRUPTED;}
+    for (int i = 0; i < 39; i ++) {
+        c = fgetc(f);
+        if (c == ',') break;
+        if (c == EOF) {fclose(f); return FILE_FILE_CORRUPTED;}
+        *(s->surname + i) = (char) c;
+    }
+
+    if (fgetc(f) != ' ') {fclose(f); return FILE_FILE_CORRUPTED;}
+    if (!fscanf(f, "%d", &s->index)) {fclose(f); return FILE_FILE_CORRUPTED;}
+
+    // get the comma and the space
+    if (fgetc(f) != ',') {fclose(f); return FILE_FILE_CORRUPTED;}
+    if (fgetc(f) != ' ') {fclose(f); return FILE_FILE_CORRUPTED;}
+
+    for (int i = 0; i < 49; i ++) {
+        c = fgetc(f);
+        if (c == ',') break;
+        if (c == EOF) {fclose(f); return FILE_FILE_CORRUPTED;}
+        *(s->field + i) = (char) c;
+    }
+
+    // get the space
+    if (fgetc(f) != ' ') {fclose(f); return FILE_FILE_CORRUPTED;}
+    for (int i = 0; i < 79; i ++) {
+        c = fgetc(f);
+        if (c == ',') break;
+        if (c == EOF) {fclose(f); return FILE_FILE_CORRUPTED;}
+        *(s->faculty + i) = (char) c;
+    }
+
+    // get the space
+    if (fgetc(f) != ' ') {fclose(f); return FILE_FILE_CORRUPTED;}
+    if (!fscanf(f, "%d", &s->year)) {fclose(f); return FILE_FILE_CORRUPTED;}
+
+    fclose(f);
+    return FILE_OK;
+}
