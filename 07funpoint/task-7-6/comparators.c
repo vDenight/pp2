@@ -28,7 +28,7 @@ int comp_int_length(int a, int b) {
     return a_digits - b_digits;
 }
 
-int comp_int_digit_sum(int a, int b) {
+int comp_int_digits_sum(int a, int b) {
     a = abs(a);
     b = abs(b);
     int current_mgn = 1;

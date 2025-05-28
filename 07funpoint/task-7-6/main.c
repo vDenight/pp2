@@ -22,7 +22,7 @@ int main() {
     *funcs = comp_int;
     *(funcs + 1) = comp_int_abs;
     *(funcs + 2) = comp_int_length;
-    *(funcs + 3) = comp_int_digit_sum;
+    *(funcs + 3) = comp_int_digits_sum;
 
     int arr_len = 0;
     printf("Podaj dlugosc tablicy: ");
