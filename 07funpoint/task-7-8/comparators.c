@@ -7,6 +7,8 @@
 #include <stdio.h>
 
 int comp_int(const void *ptr1, const void *ptr2) {
+    if (!ptr1 || !ptr2) return -1;
+
     int* it_1 = (int*) ptr1;
     int* it_2 = (int*) ptr2;
 
@@ -14,6 +16,8 @@ int comp_int(const void *ptr1, const void *ptr2) {
 }
 
 int comp_double(const void *ptr1, const void *ptr2) {
+    if (!ptr1 || !ptr2) return -1;
+
     double* db_1 = (double*) ptr1;
     double* db_2 = (double*) ptr2;
 
@@ -23,6 +27,8 @@ int comp_double(const void *ptr1, const void *ptr2) {
 }
 
 int comp_point(const void *ptr1, const void *ptr2) {
+    if (!ptr1 || !ptr2) return -1;
+
     struct point_t* p_1 = (struct point_t*) ptr1;
     struct point_t* p_2 = (struct point_t*) ptr2;
 
