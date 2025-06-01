@@ -3,7 +3,7 @@
 //
 
 #include <stdio.h>
-#include "easter.h"
+#include "functions.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -31,27 +31,27 @@ void print_rabbit() {
            " /'---'\\\n");
 }
 
-void (**easter(int size, void(*)(void), void(*)(void), void(*)(void)))(void) {
+void (**easter(int size, void(*f1)(void), void(*f2)(void), void(*f3)(void)))(void) {
 
     if (size < 1) return NULL;
 
     void (**funcs)(void) = malloc(size * sizeof(void (*)(void)));
     if (funcs == NULL) return NULL;
 
-    srand(time(NULL));
+    srand(time(NULL)); // dont care
 
     int rand_num = 0;
     for(int i = 0; i < size; i++) {
         rand_num = rand() % 3;
         switch (rand_num) {
             case 0:
-                *(funcs + i) = print_chicken;
+                *(funcs + i) = f1;
                 break;
             case 1:
-                *(funcs + i) = print_egg;
+                *(funcs + i) = f2;
                 break;
             case 2:
-                *(funcs + i) = print_rabbit;
+                *(funcs + i) = f3;
                 break;
         }
     }

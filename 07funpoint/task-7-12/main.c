@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "easter.h"
+#include "functions.h"
 
 enum main_code {
     OK = 0,

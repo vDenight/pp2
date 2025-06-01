@@ -4,5 +4,5 @@ project(task_7_12 C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(task_7_12 main.c
-		easter.h
-		easter.c)
+		functions.h
+		functions.c)
