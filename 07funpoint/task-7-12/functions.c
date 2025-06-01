@@ -17,10 +17,10 @@ void print_chicken() {
 
 void print_egg() {
     printf("  .~~~.\n"
-           " /     \\\n"
-           "(/\\/\\/\\/\\)\n"
-           " \\     /\n"
-           "  `~~~`\n");
+            " /     \\\n"
+            "(\\/\\/\\/\\)\n"
+            " \\     /\n"
+            "  `~~~`\n");
 }
 
 void print_rabbit() {
@@ -33,7 +33,7 @@ void print_rabbit() {
 
 void (**easter(int size, void(*f1)(void), void(*f2)(void), void(*f3)(void)))(void) {
 
-    if (size < 1) return NULL;
+    if (size < 1 || !f1 || !f2 || !f3) return NULL;
 
     void (**funcs)(void) = malloc(size * sizeof(void (*)(void)));
     if (funcs == NULL) return NULL;
