@@ -37,7 +37,7 @@ int main(void) {
         return INCORRECT_INPUT;
     }
 
-    if (x < 1 || y < 1 || x > width || y > height) {
+    if (x < 0 || y < 0 || x >= width || y >= height) {
         printf("Incorrect input data");
         free_board(my_board);
         return INCORRECT_INPUT_DATA;

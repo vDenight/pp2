@@ -83,7 +83,8 @@ int set_player(struct board_t *board, int x, int y) {
 }
 
 struct board_t* move_player_up(struct board_t* b) {
-    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0) return NULL;
+    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0 ||
+        b->player.x < 0 || b->player.x >= b->width || b->player.y < 0 || b->player.y >= b->height) return NULL;
     int new_y = b->player.y - 1;
 
     if (new_y == -1) new_y= b->height - 1;
@@ -96,7 +97,8 @@ struct board_t* move_player_up(struct board_t* b) {
 }
 
 struct board_t* move_player_down(struct board_t* b) {
-    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0) return NULL;
+    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0 ||
+        b->player.x < 0 || b->player.x >= b->width || b->player.y < 0 || b->player.y >= b->height) return NULL;
     int new_y = b->player.y + 1;
 
     if (new_y == b->height) new_y = 0;
@@ -109,7 +111,8 @@ struct board_t* move_player_down(struct board_t* b) {
 }
 
 struct board_t* move_player_left(struct board_t* b) {
-    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0) return NULL;
+    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0 ||
+        b->player.x < 0 || b->player.x >= b->width || b->player.y < 0 || b->player.y >= b->height) return NULL;
     int new_x = b->player.x - 1;
 
     if (new_x == -1) new_x = b->width - 1;
@@ -122,7 +125,8 @@ struct board_t* move_player_left(struct board_t* b) {
 }
 
 struct board_t* move_player_right(struct board_t* b) {
-    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0) return NULL;
+    if (b == NULL || b->board == NULL || b->width <= 0 || b->height <= 0 || b->is_init == 0 ||
+        b->player.x < 0 || b->player.x >= b->width || b->player.y < 0 || b->player.y >= b->height) return NULL;
     int new_x = b->player.x + 1;
 
     if (new_x == b->width) new_x = 0;
