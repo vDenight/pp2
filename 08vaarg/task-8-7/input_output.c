@@ -9,71 +9,80 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-int my_printf(const char* text, ...) {
+int my_printf(char* format, ...) {
     int res = 0;
 
     va_list args;
-    va_start(args, text);
+    va_start(args, format);
 
-    while (*text != '\0') {
-        switch (*text) {
+    int i = {0};
+    char* s = NULL;
+    double f = {0};
+    struct point_t p = {0};
+
+    while (*format != '\0') {
+        switch (*format) {
             case '%':
-                text++;
-                switch (*text) {
+                format++;
+                switch (*format) {
                     case 'd':
-                        int i = va_arg(args, int);
+                        i = va_arg(args, int);
                         res += print_int(i);
                         break;
                     case 's':
-                        char* s = va_arg(args, char*);
+                        s = va_arg(args, char*);
                         res += print_string(s);
                         break;
                     case 'f':
-                        double f = va_arg(args, double);
+                        f = va_arg(args, double);
                         res += print_float(f);
                         break;
                     case 'p':
-                        struct point_t p = va_arg(args, struct point_t);
+                        p = va_arg(args, struct point_t);
                         res += print_point(p);
                         break;
                     default:
                         putchar('%');
-                        putchar(*text);
+                        putchar(*format);
                         res += 2;
                 }
                 break;
             default:
-                putchar(*text);
+                putchar(*format);
                 res++;
         }
 
-        text++;
+        format++;
     }
     va_end(args);
     return res;
 }
 
-int my_scanf(const char* text, ...) {
+int my_scanf(char* format, ...) {
     int res = 0;
 
     va_list args;
-    va_start(args, text);
+    va_start(args, format);
 
-    while (*text != '\0') {
-        switch (*text) {
+    int* i = NULL;
+    double* f = NULL;
+    struct point_t* p = NULL;
+
+    while (*format != '\0') {
+        switch (*format) {
             case '%':
-                text++;
-                switch (*text) {
+                format++;
+                switch (*format) {
                     case 'd':
-                        int* i = va_arg(args, int*);
+                        i = va_arg(args, int*);
                         res += scan_int(i);
                         break;
                     case 'f':
-                        double* f = va_arg(args, double*);
+                        f = va_arg(args, double*);
                         res += scan_float(f);
                         break;
                     case 'p':
-                        struct point_t* p = va_arg(args, struct point_t*);
+                        p = va_arg(args, struct point_t*);
                         res += scan_point(p);
                         break;
                     default: break;
@@ -82,13 +91,14 @@ int my_scanf(const char* text, ...) {
             default: break;
         }
 
-        text++;
+        format++;
     }
     va_end(args);
     return res;
 }
 
 int print_string(const char* string) {
+    if (string == NULL) return 0;
     int res = 0;
     while (*string != '\0') {
         putchar(*string);
@@ -170,6 +180,8 @@ int print_point(struct point_t point) {
 }
 
 int scan_int(int* number) {
+    if (!number) return 0;
+
     *number = 0;
     int c;
     _Bool negative = 0;
@@ -192,6 +204,8 @@ int scan_int(int* number) {
 }
 
 int scan_float(double* f) {
+    if (!f) return 0;
+
     *f = 0.0;
     int c;
     _Bool started = 0;
@@ -232,6 +246,8 @@ int scan_float(double* f) {
 }
 
 int scan_point(struct point_t* point) {
+    if (!point) return 0;
+
     int x = 0, y = 0;
     int c;
     while ((c = getchar()) == ' ') {}

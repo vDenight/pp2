@@ -10,8 +10,8 @@ struct point_t {
     int y;
 };
 
-int my_printf(const char* text, ...);
-int my_scanf(const char* text, ...);
+int my_printf(char* format, ...);
+int my_scanf(char* format, ...);
 
 //helper
 int print_string(const char* string);
