@@ -19,4 +19,9 @@ int print_int(int number);
 int print_float(double f);
 int print_point(struct point_t point);
 
+int scan_int(int* number);
+int scan_float(double* f);
+int scan_point(struct point_t* point);
+
+
 #endif //INPUT_OUTPUT_H

@@ -4,6 +4,7 @@
 
 #include "input_output.h"
 
+#include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -52,7 +53,40 @@ int my_printf(const char* text, ...) {
     return res;
 }
 
-int my_scanf(const char* text, ...) { return 0; }
+int my_scanf(const char* text, ...) {
+    int res = 0;
+
+    va_list args;
+    va_start(args, text);
+
+    while (*text != '\0') {
+        switch (*text) {
+            case '%':
+                text++;
+                switch (*text) {
+                    case 'd':
+                        int* i = va_arg(args, int*);
+                        res += scan_int(i);
+                        break;
+                    case 'f':
+                        double* f = va_arg(args, double*);
+                        res += scan_float(f);
+                        break;
+                    case 'p':
+                        struct point_t* p = va_arg(args, struct point_t*);
+                        res += scan_point(p);
+                        break;
+                    default: break;
+                }
+                break;
+            default: break;
+        }
+
+        text++;
+    }
+    va_end(args);
+    return res;
+}
 
 int print_string(const char* string) {
     int res = 0;
@@ -133,6 +167,81 @@ int print_point(struct point_t point) {
     putchar(')'); res ++;
 
     return res;
+}
+
+int scan_int(int* number) {
+    *number = 0;
+    int c;
+    _Bool negative = 0;
+    _Bool started = 0;
+    while (1) {
+        c = getchar();
+        if ((c == ' ' || c == '\n') && !started) continue; // skip leading spaces
+        if (c == '-' && !started) { // handle minus
+            if (negative) break;
+            negative = 1;
+            continue;
+        }
+        if (!isdigit(c)) break;
+        started = 1;
+        *number = (*number * 10) + (c - '0');
+    }
+
+    *number = negative ? -*number : *number;
+    return started ? 1 : 0;
+}
+
+int scan_float(double* f) {
+    *f = 0.0;
+    int c;
+    _Bool started = 0;
+    _Bool after_dot = 0;
+    double current_exp = 0.1;
+    _Bool negative = 0;
+
+    while (1) {
+        c = getchar();
+
+        if ((c == ' ' || c == '\n') && !started) continue; // skip leading spaces
+        if (c == '-' && !started) { // handle minus
+            if (negative) break;
+            negative = 1;
+            continue;
+        }
+
+        if (c == '.' && !started) break; // handle dot
+        if (c == '.' && after_dot) break;
+        if (c == '.') {
+            after_dot = 1;
+            continue;
+        }
+        if (!isdigit(c)) break;
+
+        if (after_dot) {
+            *f += (c - '0') * current_exp;
+            current_exp *= 0.1;
+            if (current_exp == 0.000001) break;
+            continue;
+        }
+
+        started = 1;
+        *f = (*f * 10) + (c - '0');
+    }
+
+    return started ? 1 : 0;
+}
+
+int scan_point(struct point_t* point) {
+    int x = 0, y = 0;
+    int c;
+    while ((c = getchar()) == ' ') {}
+    if (c != '(') return 0;
+    if (!scan_int(&x)) return 0;
+    point->x = x;
+    if (!scan_int(&y)) return 1;
+    point->y = y;
+
+    return 2;
 }
 
 
