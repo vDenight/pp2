@@ -8,6 +8,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int my_printf(char* format, ...) {
     int res = 0;
@@ -18,7 +19,7 @@ int my_printf(char* format, ...) {
     int i = {0};
     char* s = NULL;
     double f = {0};
-    struct point_t p = {0};
+    struct point_t p;
 
     while (*format != '\0') {
         switch (*format) {
@@ -109,6 +110,7 @@ int print_string(const char* string) {
 }
 
 int print_int(int number) {
+
     int res = 0;
 
     if (number < 0) {
@@ -121,7 +123,7 @@ int print_int(int number) {
     int current_digit = 0;
     for (int i = 1000000000; i > 0; i = i / 10) {
         current_digit = number / i;
-        if (!started && current_digit == 0) {
+        if (!started && current_digit == 0 && i != 1) {
             continue;
         }
         started = 1;
@@ -145,7 +147,7 @@ int print_float(double f) {
     int current_digit = 0;
     for (int i = 1000000000; i > 0; i = i / 10) {
         current_digit = number / i;
-        if (!started && current_digit == 0) {
+        if (!started && current_digit == 0 && i != 1) {
             continue;
         }
         started = 1;
@@ -234,7 +236,6 @@ int scan_float(double* f) {
         if (after_dot) {
             *f += (c - '0') * current_exp;
             current_exp *= 0.1;
-            if (current_exp == 0.000001) break;
             continue;
         }
 
@@ -242,6 +243,7 @@ int scan_float(double* f) {
         *f = (*f * 10) + (c - '0');
     }
 
+    *f = negative ? -*f : *f;
     return started ? 1 : 0;
 }
 
@@ -250,12 +252,55 @@ int scan_point(struct point_t* point) {
 
     int x = 0, y = 0;
     int c;
+
     while ((c = getchar()) == ' ') {}
     if (c != '(') return 0;
-    if (!scan_int(&x)) return 0;
-    point->x = x;
-    if (!scan_int(&y)) return 1;
-    point->y = y;
+
+    // scanning int but more primitive
+    _Bool started = 0;
+    _Bool negative = 0;
+
+    while (1) {
+        c = getchar();
+        if (!started && c == '-') {
+            if (negative) {
+                return 0;
+            }
+            negative = 1;
+            continue;
+        }
+        if (!isdigit(c)) {
+            if (c == ' ') break; // correct loop termination
+            return 0;
+        }
+        started = 1;
+        x = x * 10 + (c - '0');
+    }
+
+    point->x = negative ? -x : x;
+
+    // now y
+    started = 0;
+    negative = 0;
+
+    while (1) {
+        c = getchar();
+        if (!started && c == '-') {
+            if (negative) {
+                return 1;
+            }
+            negative = 1;
+            continue;
+        }
+        if (!isdigit(c)) {
+            if (c == ')') break; // correct loop termination
+            return 1;
+        }
+        started = 1;
+        y = y * 10 + (c - '0');
+    }
+
+    point->y = negative ? -y : y;
 
     return 2;
 }
