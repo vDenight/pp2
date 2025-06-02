@@ -15,7 +15,8 @@ _Bool move_to_next_word(FILE* f) {
     while (1) {
         int c = fgetc(f);
         if (c == EOF) return 0;
-        if (c == ' ' || c == '\t' || c == '\n' || c == '.' || c == ',' || c == '"' || c == '-') continue;
+        if (c == ' ' || c == '\t' || c == '\n' || c == '.' || c == ',' || c == '"' || c == '-' || c == '\''
+            || c == '?' || c == '!') continue;
 
         fseek(f, -1, SEEK_CUR);
         return 1;
@@ -23,7 +24,8 @@ _Bool move_to_next_word(FILE* f) {
 }
 
 _Bool char_is_string_end(int c) {
-    if (c == EOF || c == '\n' || c == ' ' || c == '\t' || c == '.' || c == ',' || c == '"' || c == '-') return 1;
+    if (c == EOF || c == '\n' || c == ' ' || c == '\t' || c == '.' || c == ',' || c == '"' || c == '-' || c == '\''
+        || c == '?' || c == '!') return 1;
     return 0;
 }
 
