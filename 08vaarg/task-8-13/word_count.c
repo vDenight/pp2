@@ -11,21 +11,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-_Bool is_delimiter(int c) {
-    return c == EOF || isspace(c) || c == ',' || c == '.';
-}
+_Bool move_to_next_word(FILE* f) {
+    while (1) {
+        int c = fgetc(f);
+        if (c == EOF) return 0;
+        if (c == ' ' || c == '\t' || c == '\n' || c == '.' || c == ',' || c == '"' || c == '-') continue;
 
-int consume_delimiters_and_get_first_word_char(FILE *file) {
-    int c;
-    do {
-        c = fgetc(file);
-    } while (c != EOF && is_delimiter(c)); // Consume all delimiters
-
-    return c; // Returns the first non-delimiter char, or EOF
+        fseek(f, -1, SEEK_CUR);
+        return 1;
+    }
 }
 
 _Bool char_is_string_end(int c) {
-    if (c == EOF || c == '\n' || c == ' ' || c == '\t' || c == '.' || c == ',') return 1;
+    if (c == EOF || c == '\n' || c == ' ' || c == '\t' || c == '.' || c == ',' || c == '"' || c == '-') return 1;
     return 0;
 }
 
@@ -64,20 +62,21 @@ int* count_words(const char *filename, int *err_code, int N, ...) {
         int is_correct = 0; // -1 means not correct, 0 we dont know, 1 it is very likely correct
 
         while (move_to_next_word(f)) {
+            is_correct = 0;
+            current_index = 0;
             while (!char_is_string_end(c = fgetc(f))) {
                 if (is_correct == 1) { is_correct = -1;} // this means that it was longer for example ax and axe, because the loop should already terminate
                 if (is_correct == 0) {
                     if (*(word + current_index) == c) {
-                        current_index++;
-                        if (current_index == str_len - 2) {
+                        if (current_index == str_len - 1) {
                             is_correct = 1;
                         }
+                        current_index++;
                     } else {
                         is_correct = -1;
                     }
                 }
             }
-
             if (is_correct == 1) {
                 current_count++;
             }
@@ -91,25 +90,3 @@ int* count_words(const char *filename, int *err_code, int N, ...) {
     if (err_code) *err_code = COUNT_OK;
     return occur;
 }
-
-// _Bool read_word_from_file(FILE* f, char* buffer, int max_len) {
-//     memset(buffer, '\0', max_len);
-//     int c;
-//     _Bool started = 0;
-//     int index = 0;
-//     while (1) {
-//         c = fgetc(f);
-//         if (c == EOF && !started) {
-//             return 0;
-//         }
-//         if (c == EOF || c == ' ' || c == ',' || c == '.' || c == '\n') {
-//             if (!started) continue;
-//             return 1;
-//         }
-//
-//         started = 1;
-//         *(buffer + index) = (char) c;
-//         index++;
-//         if (index >= max_len) return 1;
-//     }
-// }
