@@ -9,7 +9,7 @@
 int* count_words(const char *filename, int *err_code, int N, ...);
 
 // helper to read words from file
-_Bool read_word_from_file(FILE* f, char* buffer, int max_len);
+// _Bool read_word_from_file(FILE* f, char* buffer, int max_len);
 
 enum count_code {
     COUNT_OK = 0,
