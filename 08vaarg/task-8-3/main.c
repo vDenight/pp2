@@ -34,7 +34,7 @@ int main(void) {
         printf("Incorrect input");
         return INCORRECT_INPUT;
     }
-    if (N < 0) {
+    if (N < 2 || N > 4) {
         printf("Incorrect input data");
         return INCORRECT_INPUT_DATA;
     }
@@ -62,8 +62,6 @@ int main(void) {
             return INCORRECT_INPUT_DATA;
         }
 
-        printf("Podaj liczby: ");
-
         switch (type) {
             case data_type_short: {
                 short* arr = malloc((elem_num + 1) * sizeof(short));
@@ -74,12 +72,14 @@ int main(void) {
                 }
                 // set last elem to -1
                 *(arr + elem_num) = -1;
+
+                printf("Podaj liczby: ");
                 for (int j = 0; j < elem_num; j++) {
                     if (scanf("%hd", (arr + j)) != 1) {
                         free(arr);
                         destroy_arr_of_arrs(arr_of_arr, N);
-                        printf("Failed to allocate memory");
-                        return ALLOC_FAIL;
+                        printf("Incorrect input");
+                        return INCORRECT_INPUT;
                     }
                 }
                 *(arr_of_arr + i) = (void*) arr;
@@ -94,12 +94,14 @@ int main(void) {
                 }
                 // set last elem to -1
                 *(arr + elem_num) = -1;
+
+                printf("Podaj liczby: ");
                 for (int j = 0; j < elem_num; j++) {
                     if (scanf("%d", (arr + j)) != 1) {
                         free(arr);
                         destroy_arr_of_arrs(arr_of_arr, N);
-                        printf("Failed to allocate memory");
-                        return ALLOC_FAIL;
+                        printf("Incorrect input");
+                        return INCORRECT_INPUT;
                     }
                 }
                 *(arr_of_arr + i) = (void*) arr;
@@ -114,12 +116,14 @@ int main(void) {
                 }
                 // set last elem to -1
                 *(arr + elem_num) = -1;
+
+                printf("Podaj liczby: ");
                 for (int j = 0; j < elem_num; j++) {
                     if (scanf("%f", (arr + j)) != 1) {
                         free(arr);
                         destroy_arr_of_arrs(arr_of_arr, N);
-                        printf("Failed to allocate memory");
-                        return ALLOC_FAIL;
+                        printf("Incorrect input");
+                        return INCORRECT_INPUT;
                     }
                 }
                 *(arr_of_arr + i) = (void*) arr;
@@ -134,12 +138,14 @@ int main(void) {
                 }
                 // set last elem to -1
                 *(arr + elem_num) = -1;
+
+                printf("Podaj liczby: ");
                 for (int j = 0; j < elem_num; j++) {
                     if (scanf("%lf", (arr + j)) != 1) {
                         free(arr);
                         destroy_arr_of_arrs(arr_of_arr, N);
-                        printf("Failed to allocate memory");
-                        return ALLOC_FAIL;
+                        printf("Incorrect input");
+                        return INCORRECT_INPUT;
                     }
                 }
                 *(arr_of_arr + i) = (void*) arr;
@@ -154,12 +160,14 @@ int main(void) {
                 }
                 // set last elem to -1
                 *(arr + elem_num) = -1;
+
+                printf("Podaj liczby: ");
                 for (int j = 0; j < elem_num; j++) {
-                    if (scanf("%hd", (arr + j)) != 1) {
+                    if (scanf("%ld", (arr + j)) != 1) {
                         free(arr);
                         destroy_arr_of_arrs(arr_of_arr, N);
-                        printf("Failed to allocate memory");
-                        return ALLOC_FAIL;
+                        printf("Incorrect input");
+                        return INCORRECT_INPUT;
                     }
                 }
                 *(arr_of_arr + i) = (void*) arr;
@@ -185,31 +193,17 @@ int main(void) {
 
 // znowu ten paskudny wrapper, jakby nie bylo ich juz za duzo i tak
 void* connect_wrapper(enum data_type_t type, int num_arrays, void** arrays_of_pointers_to_arrays) {
-    if (num_arrays < 1 || num_arrays > 10) {
+    if (num_arrays < 2 || num_arrays > 4) {
         return NULL;
     }
 
     switch (num_arrays) {
-        case 1:
-            return connect(type, 1, *(arrays_of_pointers_to_arrays + 0));
         case 2:
             return connect(type, 2, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1));
         case 3:
             return connect(type, 3, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2));
         case 4:
             return connect(type, 4, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2), *(arrays_of_pointers_to_arrays + 3));
-        case 5:
-            return connect(type, 5, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2), *(arrays_of_pointers_to_arrays + 3), *(arrays_of_pointers_to_arrays + 4));
-        case 6:
-            return connect(type, 6, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2), *(arrays_of_pointers_to_arrays + 3), *(arrays_of_pointers_to_arrays + 4), *(arrays_of_pointers_to_arrays + 5));
-        case 7:
-            return connect(type, 7, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2), *(arrays_of_pointers_to_arrays + 3), *(arrays_of_pointers_to_arrays + 4), *(arrays_of_pointers_to_arrays + 5), *(arrays_of_pointers_to_arrays + 6));
-        case 8:
-            return connect(type, 8, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2), *(arrays_of_pointers_to_arrays + 3), *(arrays_of_pointers_to_arrays + 4), *(arrays_of_pointers_to_arrays + 5), *(arrays_of_pointers_to_arrays + 6), *(arrays_of_pointers_to_arrays + 7));
-        case 9:
-            return connect(type, 9, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2), *(arrays_of_pointers_to_arrays + 3), *(arrays_of_pointers_to_arrays + 4), *(arrays_of_pointers_to_arrays + 5), *(arrays_of_pointers_to_arrays + 6), *(arrays_of_pointers_to_arrays + 7), *(arrays_of_pointers_to_arrays + 8));
-        case 10:
-            return connect(type, 10, *(arrays_of_pointers_to_arrays + 0), *(arrays_of_pointers_to_arrays + 1), *(arrays_of_pointers_to_arrays + 2), *(arrays_of_pointers_to_arrays + 3), *(arrays_of_pointers_to_arrays + 4), *(arrays_of_pointers_to_arrays + 5), *(arrays_of_pointers_to_arrays + 6), *(arrays_of_pointers_to_arrays + 7), *(arrays_of_pointers_to_arrays + 8), *(arrays_of_pointers_to_arrays + 9));
         default:
             return NULL;
     }
