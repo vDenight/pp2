@@ -178,41 +178,46 @@ long* connect_long(int N, va_list list) {
 int calculate_arr_len(enum data_type_t type, void* arr) {
     int len = 0;
     switch (type) {
-        case data_type_short:
-            short* short_arr = (short*) arr;
+        case data_type_short: {
+            short* short_arr = arr;
             while (*short_arr != -1) {
                 len++;
                 short_arr++;
             }
             break;
-        case data_type_int:
-            int* int_arr = (int*) arr;
+        }
+        case data_type_int: {
+            int* int_arr = arr;
             while (*int_arr != -1) {
                 len++;
                 int_arr++;
             }
             break;
-        case data_type_float:
-            float* float_arr = (float*) arr;
+        }
+        case data_type_float: {
+            float* float_arr = arr;
             while (*float_arr != -1) {
                 len++;
                 float_arr++;
             }
             break;
-        case data_type_double:
-            double* double_arr = (double*) arr;
+        }
+        case data_type_double: {
+            double* double_arr = arr;
             while (*double_arr != -1) {
                 len++;
                 double_arr++;
             }
             break;
-        case data_type_long:
-            long* long_arr = (long*) arr;
+        }
+        case data_type_long: {
+            long* long_arr = arr;
             while (*long_arr != -1) {
                 len++;
                 long_arr++;
             }
             break;
+        }
         default: return 0;
     }
     return len;
