@@ -6,11 +6,11 @@
 #define DATA_TYPE_H
 
 enum data_type_t {
-    data_type_short,
-    data_type_int,
-    data_type_float,
-    data_type_double,
-    data_type_long
+    data_type_short = 0,
+    data_type_int = 1,
+    data_type_float = 2,
+    data_type_double = 3,
+    data_type_long = 4
 };
 
 #endif //DATA_TYPE_H
