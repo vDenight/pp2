@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "text_modifier.h"
+#include "functions.h"
 
 enum main_code {
     OK = 0,
@@ -55,7 +55,7 @@ int main(void) {
         printf("Incorrect input");
         return INCORRECT_INPUT;
     }
-    if (N < 1 || N > 4) {
+    if (N < 2 || N > 4) {
         free(buffer);
         free(funcs);
         free(choices);
@@ -82,9 +82,6 @@ int main(void) {
     }
     char** result = NULL;
     switch (N) {
-        case 1:
-            result = text_modifier(buffer, N, *(funcs + *(choices + 0)));
-            break;
         case 2:
             result = text_modifier(buffer, N, *(funcs + *(choices + 0)), *(funcs + *(choices + 1)));
             break;
