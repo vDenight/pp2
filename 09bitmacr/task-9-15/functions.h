@@ -14,6 +14,7 @@
 
 #define CREATE_ARRAY(TYPE) \
     struct array_##TYPE##_t *create_array_##TYPE(int size) { \
+        if (size < 1) return NULL; \
         struct array_##TYPE##_t* arr = calloc(1, sizeof(struct array_##TYPE##_t)); \
         if (!arr) return NULL; \
         arr->data = calloc(size, sizeof(TYPE)); \
@@ -34,7 +35,7 @@
 
 #define SAVE_ARRAY(TYPE) \
     int save_array_##TYPE(const struct array_##TYPE##_t *array, const char *filename) { \
-        if (!array || !array->data || !filename) return 1; \
+        if (!array || !array->data || !filename || array->size < 1 || array->capacity < 1 || array->size > array->capacity) return 1; \
         \
         FILE* f = fopen(filename, "wb"); \
         if (!f) return 2; \
@@ -60,20 +61,26 @@
         struct array_##TYPE##_t *arr = create_array_##TYPE(cap); \
         if (!arr) { fclose(f); return 4; } \
         \
-        fread(arr->data, sizeof(TYPE), cap, f); \
+        int fread_val = fread(arr->data, sizeof(TYPE), cap, f); \
+        if (fread_val != cap) { fclose(f); free_array_##TYPE(arr); return 3; } \
+        arr->size = cap; \
         \
         fclose(f); \
+        \
+        *array = arr; \
         return 0; \
     } \
 
 #define SORT_ARRAY(TYPE) \
     int compare_##TYPE(const void* a, const void* b) { \
-        return *(TYPE*)a - *(TYPE*)b; \
+        if (*(TYPE*)a > *(TYPE*)b) return 1; \
+        if (*(TYPE*)a < *(TYPE*)b) return -1; \
+        return 0; \
     } \
     \
     int sort_array_##TYPE(struct array_##TYPE##_t *array) { \
-        if (!array || !array->data) return 1; \
-        qsort(array->data, array->size, sizeof(TYPE), compare_##TYPE); \
+        if (!array || !array->data || array->size < 1 || array->capacity < 1 || array->size > array->capacity) return 1; \
+        qsort(array->data, array->size, sizeof(*(array->data)), compare_##TYPE); \
         return 0; \
     } \
 
