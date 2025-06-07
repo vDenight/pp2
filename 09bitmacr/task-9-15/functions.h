@@ -5,6 +5,12 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+enum load_err {
+    FILE_OPEN_ERROR = 2,
+    FILE_CORRUPTED_ERROR = 3,
+    ALLOC_ERROR = 4
+};
+
 #define DEFINE_ARRAY(TYPE) \
     struct array_##TYPE##_t { \
         int size; \
@@ -52,17 +58,17 @@
         if (!array || !filename) return 1; \
         \
         FILE* f = fopen(filename, "rb"); \
-        if (!f) return 2; \
+        if (!f) return FILE_OPEN_ERROR; \
         \
         int cap = 0; \
         fread(&cap, sizeof(int), 1, f); \
-        if (cap < 1) { fclose(f); return 3; } \
+        if (cap < 1) { fclose(f); return FILE_CORRUPTED_ERROR; } \
         \
         struct array_##TYPE##_t *arr = create_array_##TYPE(cap); \
-        if (!arr) { fclose(f); return 4; } \
+        if (!arr) { fclose(f); return ALLOC_ERROR; } \
         \
         int fread_val = fread(arr->data, sizeof(TYPE), cap, f); \
-        if (fread_val != cap) { fclose(f); free_array_##TYPE(arr); return 3; } \
+        if (fread_val != cap) { fclose(f); free_array_##TYPE(arr); return FILE_CORRUPTED_ERROR; } \
         arr->size = cap; \
         \
         fclose(f); \

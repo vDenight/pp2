@@ -53,24 +53,24 @@ int main(void) {
         case INT: {
             struct array_int_t* arr;
             int load_res = load_array_int(&arr, buffer);
-            if (load_res == 2) {
-                free(buffer);
-                printf("Couldn't open file");
-                return COULD_NOT_OPEN_FILE;
-            }
-            if (load_res == 3) {
-                free(buffer);
-                printf("File corrupted");
-                return FILE_CORRUPTED;
-            }
-            if (load_res == 4) {
-                free(buffer);
-                printf("Failed to allocate memory");
-                return ALLOC_FAIL;
+            switch (load_res) {
+                case FILE_OPEN_ERROR:
+                    free(buffer);
+                    printf("Couldn't open file");
+                    return COULD_NOT_OPEN_FILE;
+                case FILE_CORRUPTED_ERROR:
+                    free(buffer);
+                    printf("File corrupted");
+                    return FILE_CORRUPTED;
+                case ALLOC_ERROR:
+                    free(buffer);
+                    printf("Failed to allocate memory");
+                    return ALLOC_FAIL;
+                default: break;
             }
             sort_array_int(arr);
             int save_res = save_array_int(arr, buffer);
-            if (save_res == 2) {
+            if (save_res == FILE_OPEN_ERROR) {
                 free_array_int(arr);
                 free(buffer);
                 printf("Couldn't create file");
@@ -82,24 +82,24 @@ int main(void) {
         case DOUBLE: {
             struct array_double_t* arr;
             int load_res = load_array_double(&arr, buffer);
-            if (load_res == 2) {
-                free(buffer);
-                printf("Couldn't open file");
-                return COULD_NOT_OPEN_FILE;
-            }
-            if (load_res == 3) {
-                free(buffer);
-                printf("File corrupted");
-                return FILE_CORRUPTED;
-            }
-            if (load_res == 4) {
-                free(buffer);
-                printf("Failed to allocate memory");
-                return ALLOC_FAIL;
+            switch (load_res) {
+                case FILE_OPEN_ERROR:
+                    free(buffer);
+                    printf("Couldn't open file");
+                    return COULD_NOT_OPEN_FILE;
+                case FILE_CORRUPTED_ERROR:
+                    free(buffer);
+                    printf("File corrupted");
+                    return FILE_CORRUPTED;
+                case ALLOC_ERROR:
+                    free(buffer);
+                    printf("Failed to allocate memory");
+                    return ALLOC_FAIL;
+                default: break;
             }
             sort_array_double(arr);
             int save_res = save_array_double(arr, buffer);
-            if (save_res == 2) {
+            if (save_res == FILE_OPEN_ERROR) {
                 free_array_double(arr);
                 free(buffer);
                 printf("Couldn't create file");
