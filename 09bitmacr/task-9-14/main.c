@@ -45,7 +45,7 @@ int main(void) {
         printf("Incorrect input");
         return INCORRECT_INPUT;
     }
-    if (size < 0) {
+    if (size < 1) {
         printf("Incorrect input data");
         return INCORRECT_INPUT_DATA;
     }
