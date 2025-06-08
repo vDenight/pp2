@@ -78,6 +78,7 @@ int main(void) {
     }
     dll_display(d1); putchar('\n');
     dll_display_reverse(d1); putchar('\n');
+    dll_is_empty(NULL);
 
     dll_clear(d1);
     free(d1);
