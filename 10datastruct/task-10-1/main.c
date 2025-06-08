@@ -55,7 +55,6 @@ int main(void) {
                 break;
             }
             case POP: {
-                int err;
                 int popped = stack_pop(s, &err);
                 if (err == STACK_EMPTY) {
                     printf("Stack is empty\n");
@@ -65,7 +64,7 @@ int main(void) {
                 break;
             }
             case DISPLAY: {
-                if (s->head == -1) {
+                if (s->head == 0) {
                     printf("Stack is empty\n");
                 } else {
                     stack_display(s);
@@ -74,11 +73,12 @@ int main(void) {
                 break;
             }
             default: {
-                printf("Incorrect input data");
+                printf("Incorrect input data\n");
                 break;
             }
         }
     }
 
-    return 0;
+    stack_free(s);
+    return OK;
 }

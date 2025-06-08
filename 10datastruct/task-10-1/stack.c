@@ -14,14 +14,16 @@ int stack_init(struct stack_t **stack, int N) {
     }
     struct stack_t *new_stack = calloc(1, sizeof(struct stack_t));
     if (!new_stack) {
+        *stack = NULL;
         return STACK_ALLOC_FAIL;
     }
     new_stack->data = calloc(N, sizeof(int));
     if (!new_stack->data) {
+        *stack = NULL;
         free(new_stack);
         return STACK_ALLOC_FAIL;
     }
-    new_stack->head = -1;
+    new_stack->head = 0;
     new_stack->capacity = N;
 
     *stack = new_stack;
@@ -31,28 +33,28 @@ int stack_init(struct stack_t **stack, int N) {
 int expand_stack(struct stack_t *stack);
 
 int stack_push(struct stack_t *stack, int value) {
-    if (stack == NULL || stack->data == NULL || stack->head >= stack->capacity ||
-        stack->head < -1 || stack->capacity <= 0) {
+    if (stack == NULL || stack->data == NULL || stack->head > stack->capacity ||
+        stack->head < 0 || stack->capacity <= 0) {
         return STACK_WRONG_INPUT;
     }
 
     // check if stack is full
-    if (stack->head == stack->capacity - 1) {
+    if (stack->head == stack->capacity) {
         if (expand_stack(stack)) {
             return STACK_ALLOC_FAIL;
         }
     }
 
     // now we now it is not full
-    *(stack->data + stack->head + 1) = value;
+    *(stack->data + stack->head) = value;
     stack->head++;
 
     return STACK_OK;
 }
 
 int expand_stack(struct stack_t *stack) {
-    if (stack == NULL || stack->data == NULL || stack->head >= stack->capacity ||
-        stack->head < -1 || stack->capacity <= 0) {
+    if (stack == NULL || stack->data == NULL || stack->head > stack->capacity ||
+        stack->head < 0 || stack->capacity <= 0) {
         return STACK_WRONG_INPUT;
     }
 
@@ -68,31 +70,31 @@ int expand_stack(struct stack_t *stack) {
 }
 
 int stack_pop(struct stack_t *stack, int *err_code) {
-    if (stack == NULL || stack->data == NULL || stack->head >= stack->capacity ||
-        stack->head < -1 || stack->capacity <= 0) {
+    if (stack == NULL || stack->data == NULL || stack->head > stack->capacity ||
+        stack->head < 0 || stack->capacity <= 0) {
         if (err_code) *err_code = STACK_WRONG_INPUT;
         return -1;
     }
 
-    if (stack->head == -1) {
+    if (stack->head == 0) {
         if (err_code) *err_code = STACK_EMPTY;
         return -1;
     }
 
-    int val = *(stack->data + stack->head);
-    *(stack->data + stack->head) = 0;
+    int val = *(stack->data + stack->head - 1);
+    *(stack->data + stack->head - 1) = 0;
     stack->head--;
     if (err_code) *err_code = STACK_OK;
     return val;
 }
 
 void stack_display(const struct stack_t *stack) {
-    if (stack == NULL || stack->data == NULL || stack->head >= stack->capacity ||
-    stack->head < -1 || stack->capacity <= 0) {
+    if (stack == NULL || stack->data == NULL || stack->head > stack->capacity ||
+    stack->head <= 0 || stack->capacity <= 0) {
         return;
     }
 
-    int current = stack->head;
+    int current = stack->head - 1;
     while (current >= 0) {
         printf("%d ", *(stack->data + current));
         current--;
@@ -100,8 +102,8 @@ void stack_display(const struct stack_t *stack) {
 }
 
 void stack_free(struct stack_t *stack) {
-    if (stack == NULL || stack->data == NULL || stack->head >= stack->capacity ||
-    stack->head < -1 || stack->capacity <= 0) {
+    if (stack == NULL || stack->data == NULL || stack->head > stack->capacity ||
+    stack->head < 0 || stack->capacity <= 0) {
         return;
     }
 
