@@ -123,6 +123,7 @@ void dll_put_node(struct doubly_linked_list_t* dll, int index, struct node_t* no
         }
         node->prev = NULL;
         node->next = dll->head;
+        (dll->head)->prev = node;
         dll->head = node;
         return;
     }
@@ -130,6 +131,7 @@ void dll_put_node(struct doubly_linked_list_t* dll, int index, struct node_t* no
     if (index == dll_size(dll)) {
         node->next = NULL;
         node->prev = dll->tail;
+        (dll->tail)->next = node;
         dll->tail = node;
         return;
     }
