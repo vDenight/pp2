@@ -149,7 +149,7 @@ void dll_put_node(struct doubly_linked_list_t* dll, int index, struct node_t* no
 }
 
 struct node_t* pop_node(struct doubly_linked_list_t* dll) {
-    if (dll_is_empty(dll)) return NULL;
+    if (dll == NULL || dll->head == NULL) return NULL; // dll->head == NULL instead of is_empty because clang throws an error
 
     struct node_t* temp = dll->head;
     struct node_t* new_head = temp->next;
