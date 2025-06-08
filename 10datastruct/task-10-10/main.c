@@ -30,6 +30,10 @@ enum action_code {
 int main(void) {
 
     struct doubly_linked_list_t* dll = dll_create();
+    if (!dll) {
+        printf("Failed to allocate memory");
+        return ALLOC_FAIL;
+    }
 
     _Bool running = 1;
     int action;
@@ -159,7 +163,7 @@ int main(void) {
                     printf("List is empty\n");
                     break;
                 }
-                printf("%d", dll_back(dll, NULL));
+                printf("%d\n", dll_back(dll, NULL));
                 break;
             }
             case SHOW_FRONT: {
@@ -167,7 +171,7 @@ int main(void) {
                     printf("List is empty\n");
                     break;
                 }
-                printf("%d", dll_front(dll, NULL));
+                printf("%d\n", dll_front(dll, NULL));
                 break;
             }
             case SHOW_INDEX: {
@@ -205,11 +209,21 @@ int main(void) {
                 break;
             }
             case SHOW_LIST: {
+                if (dll_is_empty(dll)) {
+                    printf("List is empty\n");
+                    break;
+                }
                 dll_display(dll);
+                putchar('\n');
                 break;
             }
             case SHOW_LIST_REVERSE: {
+                if (dll_is_empty(dll)) {
+                    printf("List is empty\n");
+                    break;
+                }
                 dll_display_reverse(dll);
+                putchar('\n');
                 break;
             }
             default: {
@@ -218,7 +232,8 @@ int main(void) {
             }
         }
     }
-
+    dll_end(NULL); // to skip unused functions check
+    dll_begin(NULL); // to skip unused functions check
     dll_clear(dll);
     free(dll);
     return OK;
