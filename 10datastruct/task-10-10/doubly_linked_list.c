@@ -25,6 +25,7 @@ int dll_push_back(struct doubly_linked_list_t* dll, int value) {
         dll->head = new_node;
     } else {
         new_node->prev = dll->tail;
+        (dll->tail)->next = new_node;
         dll->tail = new_node;
     }
 
@@ -44,6 +45,7 @@ int dll_push_front(struct doubly_linked_list_t* dll, int value) {
         dll->head = new_node;
     } else {
         new_node->next = dll->head;
+        (dll->head)->prev = new_node;
         dll->head = new_node;
     }
 
@@ -58,13 +60,17 @@ int dll_pop_front(struct doubly_linked_list_t* dll, int *err_code) {
         dll->tail = NULL;
         int val = popped->data;
         free(popped);
+        if (err_code) *err_code = 0;
         return val;
     }
     // more elem list
     int val = (dll->head)->data;
     struct node_t* new_head = (dll->head)->next;
     free(dll->head);
+    new_head->prev = NULL;
     dll->head = new_head;
+
+    if (err_code) *err_code = 0;
     return val;
 }
 
@@ -76,13 +82,17 @@ int dll_pop_back(struct doubly_linked_list_t* dll, int *err_code) {
         dll->tail = NULL;
         int val = popped->data;
         free(popped);
+        if (err_code) *err_code = 0;
         return val;
     }
     // more elem list
     int val = (dll->tail)->data;
     struct node_t* new_tail = (dll->tail)->prev;
     free(dll->tail);
+    new_tail->next = NULL;
     dll->tail= new_tail;
+
+    if (err_code) *err_code = 0;
     return val;
 }
 
@@ -133,6 +143,7 @@ int dll_at(const struct doubly_linked_list_t* dll, unsigned int index, int *err_
     for (unsigned int i = 0; i < index; i++) {
         current = current->next;
     }
+    if (err_code) *err_code = 0;
     return current->data;
 }
 
@@ -151,16 +162,16 @@ int dll_insert(struct doubly_linked_list_t* dll, unsigned int index, int value) 
     if (dll == NULL) return 1;
     if (index > (unsigned int) dll_size(dll)) return 1;
 
+    if (index == 0) {
+        return dll_push_front(dll, value);
+    }
+    if (index == (unsigned int) dll_size(dll)) {
+        return dll_push_back(dll, value);
+    }
+
     struct node_t* new_node = calloc(1, sizeof(struct node_t));
     if (!new_node) return 2;
     new_node->data = value;
-
-    if (index == 0) {
-        dll_push_front(dll, value);
-    }
-    if (index == dll_size(dll)) {
-        dll_push_back(dll, value);
-    }
 
     struct node_t* prev = dll_node_at(dll, index - 1);
     struct node_t* next = dll_node_at(dll, index);
@@ -179,9 +190,11 @@ int dll_remove(struct doubly_linked_list_t* dll, unsigned int index, int *err_co
     if (index >= (unsigned int) dll_size(dll)) {if (err_code) *err_code = 1; return 0;}
 
     if (index == 0) {
+        if (err_code) *err_code = 0;
         return dll_pop_front(dll, NULL);
     }
-    if (index == (dll_size(dll) - 1)) {
+    if (index == (unsigned int) (dll_size(dll) - 1)) {
+        if (err_code) *err_code = 0;
         return dll_pop_back(dll, NULL);
     }
 
@@ -194,6 +207,8 @@ int dll_remove(struct doubly_linked_list_t* dll, unsigned int index, int *err_co
 
     int val = pop->data;
     free(pop);
+
+    if (err_code) *err_code = 0;
     return val;
 }
 
@@ -203,7 +218,6 @@ void dll_clear(struct doubly_linked_list_t* dll) {
     while (!err_code) {
         dll_pop_front(dll, &err_code);
     }
-    free(dll);
 }
 
 void dll_display(const struct doubly_linked_list_t* dll) {
